@@ -11,7 +11,7 @@ import SceneKit
 import simd
 
 // Returns plane / ray intersection distance from ray origin.
-func planeIntersect(planeNormal: float3, planeDist: Float, rayOrigin: float3, rayDirection: float3) -> Float {
+func planeIntersect(planeNormal: SIMD3<Float>, planeDist: Float, rayOrigin: SIMD3<Float>, rayDirection: SIMD3<Float>) -> Float {
     return (planeDist - simd_dot(planeNormal, rayOrigin)) / simd_dot(planeNormal, rayDirection)
 }
 
@@ -20,7 +20,7 @@ class Character: NSObject {
     static private let speedFactor: CGFloat = 2.0
     static private let stepsCount = 10
 
-    static private let initialPosition = float3(0.1, -0.2, 0)
+    static private let initialPosition = SIMD3<Float>(0.1, -0.2, 0)
     
     // some constants
     static private let gravity = Float(0.004)
@@ -28,7 +28,7 @@ class Character: NSObject {
     static private let minAltitude = Float(-10)
     static private let enableFootStepSound = true
     static private let collisionMargin = Float(0.04)
-    static private let modelOffset = float3(0, -collisionMargin, 0)
+    static private let modelOffset = SIMD3<Float>(0, -collisionMargin, 0)
     static private let collisionMeshBitMask = 8
     
     enum GroundType: Int {
@@ -46,14 +46,14 @@ class Character: NSObject {
     
     // Physics
     private var characterCollisionShape: SCNPhysicsShape?
-    private var collisionShapeOffsetFromModel = float3.zero
+    private var collisionShapeOffsetFromModel = SIMD3<Float>.zero
     private var downwardAcceleration: Float = 0
     
     // Jump
     private var controllerJump: Bool = false
     private var jumpState: Int = 0
     private var groundNode: SCNNode?
-    private var groundNodeLastPosition = float3.zero
+    private var groundNodeLastPosition = SIMD3<Float>.zero
     var baseAltitude: Float = 0
     private var targetAltitude: Float = 0
     
@@ -63,7 +63,7 @@ class Character: NSObject {
     
     // Direction
     private var previousUpdateTime: TimeInterval = 0
-    private var controllerDirection = float2.zero
+    private var controllerDirection = SIMD2<Float>.zero
     
     // states
     private var attackCount: Int = 0
@@ -100,7 +100,7 @@ class Character: NSObject {
     
     // actions
     var isJump: Bool = false
-    var direction = float2()
+    var direction = SIMD2<Float>()
     var physicsWorld: SCNPhysicsWorld?
     
     // MARK: - Initialization
@@ -142,7 +142,7 @@ class Character: NSObject {
 
         let collisionGeometry = SCNCapsule(capRadius: collisionCapsuleRadius, height: collisionCapsuleHeight)
         characterCollisionShape = SCNPhysicsShape(geometry: collisionGeometry, options:[.collisionMargin: Character.collisionMargin])
-        collisionShapeOffsetFromModel = float3(0, Float(collisionCapsuleHeight) * 0.51, 0.0)
+        collisionShapeOffsetFromModel = SIMD3<Float>(0, Float(collisionCapsuleHeight) * 0.51, 0.0)
     }
 
     private func loadParticles() {
@@ -347,10 +347,10 @@ class Character: NSObject {
             return
         }
         
-        var characterVelocity = float3.zero
+        var characterVelocity = SIMD3<Float>.zero
         
         // setup
-        var groundMove = float3.zero
+        var groundMove = SIMD3<Float>.zero
         
         // did the ground moved?
         if groundNode != nil {
@@ -358,7 +358,7 @@ class Character: NSObject {
             groundMove = groundPosition - groundNodeLastPosition
         }
         
-        characterVelocity = float3(groundMove.x, 0, groundMove.z)
+        characterVelocity = SIMD3<Float>(groundMove.x, 0, groundMove.z)
         
         let direction = characterDirection(withPointOfView:renderer.pointOfView)
         
@@ -391,7 +391,7 @@ class Character: NSObject {
         }
         
         // put the character on the ground
-        let up = float3(0, 1, 0)
+        let up = SIMD3<Float>(0, 1, 0)
         var wPosition = characterNode.simdWorldPosition
         // gravity
         downwardAcceleration -= Character.gravity
@@ -417,7 +417,7 @@ class Character: NSObject {
         let wasBurning = isBurning
         
         if let hit = hitResult {
-            let ground = float3(hit.worldCoordinates)
+            let ground = SIMD3<Float>(hit.worldCoordinates)
             if wPosition.y <= ground.y + Character.collisionMargin {
                 wPosition.y = ground.y + Character.collisionMargin
                 if downwardAcceleration < 0 {
@@ -437,7 +437,7 @@ class Character: NSObject {
             }
         }
         
-        groundNodeLastPosition = (groundNode != nil) ? groundNode!.simdWorldPosition: float3.zero
+        groundNodeLastPosition = (groundNode != nil) ? groundNode!.simdWorldPosition: SIMD3<Float>.zero
         
         //jump -------------------------------------------------------------
         if jumpState == 0 {
@@ -542,19 +542,19 @@ class Character: NSObject {
         }
     }
     
-    func characterDirection(withPointOfView pointOfView: SCNNode?) -> float3 {
+    func characterDirection(withPointOfView pointOfView: SCNNode?) -> SIMD3<Float> {
         let controllerDir = self.direction
         if controllerDir.allZero() {
-            return float3.zero
+            return SIMD3<Float>.zero
         }
         
-        var directionWorld = float3.zero
+        var directionWorld = SIMD3<Float>.zero
         if let pov = pointOfView {
-            let p1 = pov.presentation.simdConvertPosition(float3(controllerDir.x, 0.0, controllerDir.y), to: nil)
-            let p0 = pov.presentation.simdConvertPosition(float3.zero, to: nil)
+            let p1 = pov.presentation.simdConvertPosition(SIMD3<Float>(controllerDir.x, 0.0, controllerDir.y), to: nil)
+            let p0 = pov.presentation.simdConvertPosition(SIMD3<Float>.zero, to: nil)
             directionWorld = p1 - p0
             directionWorld.y = 0
-            if simd_any(directionWorld != float3.zero) {
+            if simd_any(directionWorld != SIMD3<Float>.zero) {
                 let minControllerSpeedFactor = Float(0.2)
                 let maxControllerSpeedFactor = Float(1.0)
                 let speed = simd_length(controllerDir) * (maxControllerSpeedFactor - minControllerSpeedFactor) + minControllerSpeedFactor
@@ -611,7 +611,7 @@ class Character: NSObject {
     }
     
     // MARK: - physics contact
-    func slideInWorld(fromPosition start: float3, velocity: float3) {
+    func slideInWorld(fromPosition start: SIMD3<Float>, velocity: SIMD3<Float>) {
         let maxSlideIteration: Int = 4
         var iteration = 0
         var stop: Bool = false
@@ -651,15 +651,15 @@ class Character: NSObject {
         characterNode!.simdWorldPosition = replacementPoint - collisionShapeOffsetFromModel
     }
 
-    private func handleSlidingAtContact(_ closestContact: SCNPhysicsContact, position start: float3, velocity: float3)
+    private func handleSlidingAtContact(_ closestContact: SCNPhysicsContact, position start: SIMD3<Float>, velocity: SIMD3<Float>)
         -> (computedVelocity: simd_float3, colliderPositionAtContact: simd_float3) {
         let originalDistance: Float = simd_length(velocity)
 
         let colliderPositionAtContact = start + Float(closestContact.sweepTestFraction) * velocity
 
         // Compute the sliding plane.
-        let slidePlaneNormal = float3(closestContact.contactNormal)
-        let slidePlaneOrigin = float3(closestContact.contactPoint)
+        let slidePlaneNormal = SIMD3<Float>(closestContact.contactNormal)
+        let slidePlaneOrigin = SIMD3<Float>(closestContact.contactPoint)
         let centerOffset = slidePlaneOrigin - colliderPositionAtContact
 
         // Compute destination relative to the point of contact.
@@ -676,7 +676,7 @@ class Character: NSObject {
         let angle = simd_dot(slidePlaneNormal, normalizedVelocity)
 
         var frictionCoeff: Float = 0.3
-        if fabs(angle) < 0.9 {
+        if abs(angle) < 0.9 {
             t += 10E-3
             frictionCoeff = 1.0
         }

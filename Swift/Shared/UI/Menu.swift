@@ -66,7 +66,7 @@ class Menu: SKNode {
     
     @IBAction func menuChanged(_ sender: Any) {
         hideSlidersMenu()
-        if let index = cameraButtons.index(of: sender as! Button) {
+        if let index = cameraButtons.firstIndex(of: sender as! Button) {
             self.delegate?.debugMenuSelectCameraAtIndex(index)
             if index == 2 {
                 showSlidersMenu()

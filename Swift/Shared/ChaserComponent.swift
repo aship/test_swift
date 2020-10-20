@@ -32,11 +32,11 @@ class ChaserComponent: BaseComponent {
             chaseGoal = GKGoal(toSeekAgent: (player?.agent)!)
             wanderGoal = GKGoal(toWander: self.wanderSpeed)
 
-            var center: [float2] = []
-            center.append(float2(x: -1, y: 9))
-            center.append(float2(x: 1, y: 9))
-            center.append(float2(x: 1, y: 11))
-            center.append(float2(x: -1, y: 11))
+            var center: [SIMD2<Float>] = []
+            center.append(SIMD2<Float>(x: -1, y: 9))
+            center.append(SIMD2<Float>(x: 1, y: 9))
+            center.append(SIMD2<Float>(x: 1, y: 11))
+            center.append(SIMD2<Float>(x: -1, y: 11))
 
             let p = GKPath(points: center, radius: 0.5, cyclical: true)
             centerGoal = GKGoal(toStayOn: p, maxPredictionTime: 1)

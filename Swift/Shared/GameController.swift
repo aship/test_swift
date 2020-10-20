@@ -163,7 +163,7 @@ class GameController: NSObject, ExtraProtocols {
 
         let keepAltitude = SCNTransformConstraint.positionConstraint(inWorldSpace: true, with: {(_ node: SCNNode, _ position: SCNVector3) -> SCNVector3 in
                 guard let strongSelf = weakSelf else { return position }
-                var position = float3(position)
+                var position = SIMD3<Float>(position)
                 position.y = strongSelf.character!.baseAltitude + desiredAltitude
                 return SCNVector3( position )
             })
@@ -330,7 +330,7 @@ class GameController: NSObject, ExtraProtocols {
         anim.repeatCount = .infinity
         anim.autoreverses = true
         anim.duration = 1.2
-        anim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
 
         self.enemy1!.addAnimation(anim, forKey: "")
         self.enemy2!.addAnimation(anim, forKey: "")
@@ -427,7 +427,7 @@ class GameController: NSObject, ExtraProtocols {
         // now animate the transform to identity to smoothly move to the new desired position
         SCNTransaction.begin()
         SCNTransaction.animationDuration = duration
-        SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
         cameraNode.transform = SCNMatrix4Identity
 
         if let cameraTemplate = camera.camera {
@@ -756,7 +756,7 @@ class GameController: NSObject, ExtraProtocols {
                 continue
             }
 
-            let otherPos = float3(friends[j].position)
+            let otherPos = SIMD3<Float>(friends[j].position)
             let v = otherPos - pos
             let dist = simd_length(v)
             if dist < pandaDiameter {
@@ -1179,10 +1179,6 @@ class GameController: NSObject, ExtraProtocols {
             self.gamePadRight = gamepad.rightThumbstick
             buttonA = gamepad.buttonA
             buttonB = gamepad.buttonB
-        } else if let gamepad = gameController.gamepad {
-            self.gamePadLeft = gamepad.dpad
-            buttonA = gamepad.buttonA
-            buttonB = gamepad.buttonB
         } else if let gamepad = gameController.microGamepad {
             self.gamePadLeft = gamepad.dpad
             buttonA = gamepad.buttonA
@@ -1242,19 +1238,19 @@ class GameController: NSObject, ExtraProtocols {
 
     func padOverlayVirtualStickInteractionDidStart(_ padNode: PadOverlay) {
         if padNode == overlay!.controlOverlay!.leftPad {
-            characterDirection = float2(Float(padNode.stickPosition.x), -Float(padNode.stickPosition.y))
+            characterDirection = SIMD2<Float>(Float(padNode.stickPosition.x), -Float(padNode.stickPosition.y))
         }
         if padNode == overlay!.controlOverlay!.rightPad {
-            cameraDirection = float2( -Float(padNode.stickPosition.x), Float(padNode.stickPosition.y))
+            cameraDirection = SIMD2<Float>( -Float(padNode.stickPosition.x), Float(padNode.stickPosition.y))
         }
     }
 
     func padOverlayVirtualStickInteractionDidChange(_ padNode: PadOverlay) {
         if padNode == overlay!.controlOverlay!.leftPad {
-            characterDirection = float2(Float(padNode.stickPosition.x), -Float(padNode.stickPosition.y))
+            characterDirection = SIMD2<Float>(Float(padNode.stickPosition.x), -Float(padNode.stickPosition.y))
         }
         if padNode == overlay!.controlOverlay!.rightPad {
-            cameraDirection = float2( -Float(padNode.stickPosition.x), Float(padNode.stickPosition.y))
+            cameraDirection = SIMD2<Float>( -Float(padNode.stickPosition.x), Float(padNode.stickPosition.y))
         }
     }
 

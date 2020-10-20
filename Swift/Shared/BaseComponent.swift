@@ -71,7 +71,7 @@ class BaseComponent: GKComponent {
 
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.4
-        SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+        SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
 
         SCNTransaction.completionBlock = {
             explositionScene.rootNode.enumerateHierarchy({ (node: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
