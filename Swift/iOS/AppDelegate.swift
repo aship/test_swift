@@ -6,9 +6,13 @@
  a standard App Delegate.
  */
 
-import UIKit
+import SwiftUI
 
-@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
+    var gameController: GameController?
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
+        return true
+    }
 }
