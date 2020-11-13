@@ -169,7 +169,7 @@ class GameViewController: ViewController, SCNSceneRendererDelegate, SCNPhysicsCo
         }
         
         // Update the camera position with some inertia.
-        SCNTransaction.animateWithDuration(0.5, timingFunction: CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)) {
+        SCNTransaction.animateWithDuration(0.5, timingFunction: CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)) {
             self.cameraYHandle.rotation = SCNVector4(0, 1, 0, self.cameraYHandle.rotation.y * (self.cameraYHandle.rotation.w - SCNFloat(directionToPan.x) * F))
             self.cameraXHandle.rotation = SCNVector4(1, 0, 0, (max(SCNFloat(-M_PI_2), min(0.13, self.cameraXHandle.rotation.w + SCNFloat(directionToPan.y) * F))))
         }
@@ -370,9 +370,9 @@ class GameViewController: ViewController, SCNSceneRendererDelegate, SCNPhysicsCo
             cameraYAnimation.toValue = 0.0
             cameraYAnimation.isAdditive = true
             cameraYAnimation.beginTime = CACurrentMediaTime() + 3.0 // wait a little bit before stating
-            cameraYAnimation.fillMode = kCAFillModeBoth
+            cameraYAnimation.fillMode = CAMediaTimingFillMode.both
             cameraYAnimation.duration = 5.0
-            cameraYAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+            cameraYAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
             self.cameraYHandle.addAnimation(cameraYAnimation, forKey: nil)
             
             let cameraXAnimation = cameraYAnimation.copy() as! CABasicAnimation
