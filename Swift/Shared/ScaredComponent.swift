@@ -28,7 +28,7 @@ class ScaredComponent: BaseComponent {
             fleeGoal = GKGoal(toFleeAgent: player!.agent)
             wanderGoal = GKGoal(toWander:wanderSpeed)
 
-            let centers: [float2] = [
+            let centers: [SIMD2<Float>] = [
                 [-1, 9],
                 [1, 9],
                 [1, 11],
