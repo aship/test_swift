@@ -23,7 +23,9 @@ class ControlOverlaySKNode: SKNode {
                                    y: CGFloat(40))
         addChild(leftPad)
         
-        let rightPadX = frame.size.width - 20 - rightPad.size.width
+        // let rightPadX = frame.size.width - 20 - rightPad.size.width
+        // let rightPadX = 500
+        let rightPadX = 400
         
         rightPad.position = CGPoint(x: CGFloat(rightPadX),
                                     y: CGFloat(40))

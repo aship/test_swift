@@ -37,10 +37,10 @@ extension GameObject {
     }
     
     func turnOffEXR() {
-        self.turnOffEXRForMAterialProperty(property: scene!.background)
-        self.turnOffEXRForMAterialProperty(property: scene!.lightingEnvironment)
+        self.turnOffEXRForMAterialProperty(property: scene.background)
+        self.turnOffEXRForMAterialProperty(property: scene.lightingEnvironment)
         
-        scene?.rootNode.enumerateChildNodes { (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
+        scene.rootNode.enumerateChildNodes { (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
             if let materials = child.geometry?.materials {
                 for material in materials {
                     self.turnOffEXRForMAterialProperty(property: material.selfIllumination)
@@ -50,7 +50,7 @@ extension GameObject {
     }
     
     func turnOffNormalMaps() {
-        scene?.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
+        scene.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
             if let materials = child.geometry?.materials {
                 for material in materials {
                     material.normal.contents = SKColor.black
@@ -60,19 +60,19 @@ extension GameObject {
     }
     
     func turnOffHDR() {
-        scene?.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
+        scene.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
             child.camera?.wantsHDR = false
         })
     }
     
     func turnOffDepthOfField() {
-        scene?.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
+        scene.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
             child.camera?.wantsDepthOfField = false
         })
     }
     
     func turnOffSoftShadows() {
-        scene?.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
+        scene.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
             if let lightSampleCount = child.light?.shadowSampleCount {
                 child.light?.shadowSampleCount = min(lightSampleCount, 1)
             }
@@ -80,7 +80,7 @@ extension GameObject {
     }
     
     func turnOffPostProcess() {
-        scene?.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
+        scene.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
             if let light = child.light {
                 light.shadowCascadeCount = 0
                 light.shadowMapSize = CGSize(width: 1024, height: 1024)
@@ -89,11 +89,11 @@ extension GameObject {
     }
     
     func turnOffOverlay() {
-        sceneRenderer?.overlaySKScene = nil
+  //      sceneRenderer?.overlaySKScene = nil
     }
     
     func turnOffVertexShaderModifiers() {
-        scene?.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
+        scene.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
             if var shaderModifiers = child.geometry?.shaderModifiers {
                 shaderModifiers[SCNShaderModifierEntryPoint.geometry] = nil
                 child.geometry?.shaderModifiers = shaderModifiers
@@ -110,7 +110,7 @@ extension GameObject {
     }
     
     func turnOffVegetation() {
-        scene?.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
+        scene.rootNode.enumerateChildNodes({ (child: SCNNode, _: UnsafeMutablePointer<ObjCBool>) in
             guard let materialName = child.geometry?.firstMaterial?.name as NSString? else { return }
             if materialName.hasPrefix("plante") {
                 child.isHidden = true

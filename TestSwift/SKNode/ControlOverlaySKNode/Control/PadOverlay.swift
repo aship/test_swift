@@ -110,6 +110,8 @@ class PadOverlay: SKNode {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        print("PAD touchesBegan")
+        
         trackingTouch = touches.first
         startLocation = trackingTouch!.location(in: self)
         // Center start location

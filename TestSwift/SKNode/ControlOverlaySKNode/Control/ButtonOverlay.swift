@@ -93,6 +93,8 @@ class ButtonOverlay: SKNode {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        print("BUTTON touchesBegan")
+        
         trackingTouch = touches.first
         inner.fillColor = SKColor.black
         delegate!.willPress(self)

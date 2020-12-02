@@ -17,7 +17,7 @@ extension GameObject {
     // from the current position to the new position
     func setActiveCamera(_ cameraName: String,
                          animationDuration duration: CFTimeInterval) {
-        guard let camera = scene?.rootNode.childNode(withName: cameraName,
+        guard let camera = scene.rootNode.childNode(withName: cameraName,
                                                      recursively: true)
         else { return }
         
@@ -26,9 +26,11 @@ extension GameObject {
         }
         
         self.lastActiveCamera = activeCamera
+        
         if activeCamera != nil {
             self.lastActiveCameraFrontDirection = (activeCamera?.presentation.simdWorldFront)!
         }
+        
         self.activeCamera = camera
         
         // save old transform in world space
@@ -37,17 +39,20 @@ extension GameObject {
         // re-parent
         camera.addChildNode(cameraNode)
         
-        // compute the old transform relative to our new parent node (yeah this is the complex part)
+        // compute the old transform relative to our new parent node
+        // (yeah this is the complex part)
         let parentTransform = camera.presentation.worldTransform
         let parentInv = SCNMatrix4Invert(parentTransform)
         
-        // with this new transform our position is unchanged in workd space (i.e we did re-parent but didn't move).
+        // with this new transform our position is unchanged in workd space
+        // (i.e we did re-parent but didn't move).
         cameraNode.transform = SCNMatrix4Mult(oldTransform, parentInv)
         
         // now animate the transform to identity to smoothly move to the new desired position
         SCNTransaction.begin()
         SCNTransaction.animationDuration = duration
         SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+        
         cameraNode.transform = SCNMatrix4Identity
         
         if let cameraTemplate = camera.camera {

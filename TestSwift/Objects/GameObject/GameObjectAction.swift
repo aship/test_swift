@@ -26,8 +26,8 @@ extension GameObject {
         SCNTransaction.animationDuration = 0.0
         SCNTransaction.completionBlock = {() -> Void in
             //trigger particles
-            let door: SCNNode? = self.scene!.rootNode.childNode(withName: "door", recursively: true)
-            let particle_door: SCNNode? = self.scene!.rootNode.childNode(withName: "particles_door", recursively: true)
+            let door: SCNNode? = self.scene.rootNode.childNode(withName: "door", recursively: true)
+            let particle_door: SCNNode? = self.scene.rootNode.childNode(withName: "particles_door", recursively: true)
             self.addParticles(with: .unlockDoor, withTransform: particle_door!.worldTransform)
             
             //audio
@@ -68,7 +68,8 @@ extension GameObject {
         keyIsVisible = true
         
         // get the key node
-        let key: SCNNode? = scene!.rootNode.childNode(withName: "key", recursively: true)
+        let key: SCNNode? = scene.rootNode.childNode(withName: "key",
+                                                     recursively: true)
         
         //sound fx
         playSound(AudioSourceKind.collectBig)
@@ -116,7 +117,7 @@ extension GameObject {
                 
                 // play sound
                 playSound(AudioSourceKind.collect)
-                self.overlay?.didCollectKey()
+                self.skScene?.didCollectKey()
                 
                 self.collectedKeys += 1
             }
@@ -129,7 +130,7 @@ extension GameObject {
                 playSound(AudioSourceKind.collect)
                 
                 // update the overlay
-                self.overlay?.collectedGemsCount = self.collectedGems
+                self.skScene?.collectedGemsCount = self.collectedGems
                 
                 if self.collectedGems == 1 {
                     //we collect a gem, show the key after 1 second

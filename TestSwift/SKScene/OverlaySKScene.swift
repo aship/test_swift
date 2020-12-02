@@ -6,12 +6,10 @@
  This class manages the 2D overlay (score).
 */
 
-import Foundation
-import SceneKit
 import SpriteKit
 
 class OverlaySKScene: SKScene {
-    private var overlayNode: SKNode
+    var overlayNode = SKNode()
     private var congratulationsGroupNode: SKNode?
     private var collectedKeySprite: SKSpriteNode!
     private var collectedGemsSprites = [SKSpriteNode]()
@@ -20,11 +18,27 @@ class OverlaySKScene: SKScene {
     private var demoMenu: Menu?
     
     public var controlOverlay: ControlOverlaySKNode?
+    
+    var gameObject: GameObject?
 
 // MARK: - Initialization
-    init(size: CGSize, gameObject: GameObject) {
-        overlayNode = SKNode()
+    override init(size: CGSize) {
         super.init(size: size)
+//    override init() {
+    //    overlayNode = SKNode()
+//        super.init()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+   // init(size: CGSize, gameObject: GameObject) {
+    override func didMove(to view: SKView) {
+      //  overlayNode = SKNode()
+      //  super.init(size: size)
+        
+        self.view?.isMultipleTouchEnabled = true
         
         let w: CGFloat = size.width
         let h: CGFloat = size.height
@@ -75,18 +89,21 @@ class OverlaySKScene: SKScene {
             controlOverlay!.buttonB.delegate = gameObject
             addChild(controlOverlay!)
         #endif
+        
+        let size = CGSize(width: 100.0,
+                          height: 100.0)
+        
         // the demo UI
         demoMenu = Menu(size: size)
-        demoMenu!.delegate = gameObject
+        demoMenu!.delegate = self.gameObject
         demoMenu!.isHidden = true
         overlayNode.addChild(demoMenu!)
         
         // Assign the SpriteKit overlay to the SceneKit view.
         isUserInteractionEnabled = false
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        
+        print("self.view?.isMultipleTouchEnabled \(String(describing: self.view?.isMultipleTouchEnabled))")
+    //    self.view?.isMultipleTouchEnabled = true
     }
     
     func layout2DOverlay() {
@@ -147,11 +164,11 @@ class OverlaySKScene: SKScene {
     
     #if os( iOS )
     func showVirtualPad() {
-        controlOverlay!.isHidden = false
+  //      controlOverlay!.isHidden = false
     }
     
     func hideVirtualPad() {
-        controlOverlay!.isHidden = true
+    //    controlOverlay!.isHidden = true
     }
     #endif
     

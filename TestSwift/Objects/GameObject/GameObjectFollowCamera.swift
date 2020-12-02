@@ -23,7 +23,8 @@ extension GameObject {
         follow.minimumDistance = distance
         follow.maximumDistance = distance
         
-        // configure a constraint to maintain a constant altitude relative to the character
+        // configure a constraint to maintain a constant altitude
+        // relative to the character
         let desiredAltitude = abs(cameraNode.simdWorldPosition.y)
         weak var weakSelf = self
         
@@ -53,8 +54,10 @@ extension GameObject {
                 return transform
             }
             
-            // Slowly update the acceleration constraint influence factor to smoothly reenable the acceleration.
-            accelerationConstraint.influenceFactor = min(1, accelerationConstraint.influenceFactor + 0.01)
+            // Slowly update the acceleration constraint influence factor
+            // to smoothly reenable the acceleration.
+            accelerationConstraint.influenceFactor = min(1,
+                                                         accelerationConstraint.influenceFactor + 0.01)
             
             let targetPosition = strongSelf.lookAtTarget.presentation.simdWorldPosition
             let cameraDirection = strongSelf.cameraDirection
@@ -67,7 +70,7 @@ extension GameObject {
             accelerationConstraint.influenceFactor = 0
             
             let characterWorldUp = strongSelf.character?.node?.presentation.simdWorldUp
-            
+
             transformNode.transform = transform
             
             let mulX = simd_quaternion(GameObject.CameraOrientationSensitivity * cameraDirection.x,

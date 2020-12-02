@@ -1,34 +1,40 @@
 //
 //  ContentView.swift
-//  fox2-swift iOS
+//  TestSpriteKit
 //
-//  Created by aship on 2020/10/20.
-//  Copyright © 2020 com.apple. All rights reserved.
+//  Created by aship on 2020/10/02.
 //
 
 import SwiftUI
 import SceneKit
+import SpriteKit
 
-struct ContentView: UIViewRepresentable {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+struct ContentView: View {
+    @StateObject var gameObject = GameObject()
     
-    class Coordinator: NSObject {
-        //      var scene: SKScene?
+    var body: some View {
+        ZStack() {
+            SceneView(scene: gameObject.scene,
+                      pointOfView: gameObject.pointOfView,
+                      antialiasingMode: .none,
+                      delegate: gameObject)
+            
+//            Button(action: {
+//                print("555555")
+//                gameObject.showsStatistics = true
+//                gameObject.debugOptions = [.renderAsWireframe,
+//                                            .showBoundingBoxes]
+//            }) {
+//                Text("Debug").padding(.top, 300)
+//            }
+            SpriteView(scene: gameObject.skScene!,
+                       options: [.allowsTransparency])
+        }
     }
-    
-    func makeCoordinator() -> Coordinator {
-        return Coordinator()
-    }
-    
-    func makeUIView(context: Context) -> SCNView {
-        let scnView = SCNView()
-        scnView.backgroundColor = UIColor.blue
-    
-        appDelegate.GameObject = GameObject(scnView: scnView)
+}
 
-        return scnView
-    }
-    
-    func updateUIView(_ view: SCNView, context: Context) {
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
     }
 }

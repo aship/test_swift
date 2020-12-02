@@ -33,8 +33,9 @@ extension GameObject {
     
     func addParticles(with kind: ParticleKind, withTransform transform: SCNMatrix4) {
         let particles = particleSystems(with: kind)
+        
         for ps: SCNParticleSystem in particles {
-            scene!.addParticleSystem(ps, transform: transform)
+            scene.addParticleSystem(ps, transform: transform)
         }
     }
 }

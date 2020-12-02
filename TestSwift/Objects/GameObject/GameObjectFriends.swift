@@ -86,11 +86,11 @@ extension GameObject {
         let FRIEND_AREA_LENGTH: Float = 5.0
         
         // group them
-        var friendsNode: SCNNode? = scene!.rootNode.childNode(withName: "friends", recursively: false)
+        var friendsNode: SCNNode? = scene.rootNode.childNode(withName: "friends", recursively: false)
         if friendsNode == nil {
             friendsNode = SCNNode()
             friendsNode!.name = "friends"
-            scene!.rootNode.addChildNode(friendsNode!)
+            scene.rootNode.addChildNode(friendsNode!)
         }
         
         //animations

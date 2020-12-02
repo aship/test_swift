@@ -11,6 +11,11 @@ import GameplayKit
 extension GameObject {
     func renderer(_ renderer: SCNSceneRenderer,
                   updateAtTime time: TimeInterval) {
+        if self.skScene!.controlOverlay!.isHidden == true {
+            print("VIRTUAL PAD ON")
+            self.skScene!.showVirtualPad()
+        }
+
         // compute delta time
         if lastUpdateTime == 0 {
             lastUpdateTime = time

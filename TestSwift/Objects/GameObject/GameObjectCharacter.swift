@@ -13,8 +13,8 @@ extension GameObject {
         
         // keep a pointer to the physicsWorld from the character
         // because we will need it when updating the character's position
-        character!.physicsWorld = self.scene!.physicsWorld
+        character!.physicsWorld = self.scene.physicsWorld
         
-        self.scene!.rootNode.addChildNode(character!.node!)
+        self.scene.rootNode.addChildNode(character!.node!)
     }
 }

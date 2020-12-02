@@ -51,24 +51,24 @@ extension GameObject {
         guard let victoryMusic = SCNAudioSource(named: "audio/Music_victory.mp3") else { return }
         victoryMusic.volume = 0.5
         
-        self.scene?.rootNode.addAudioPlayer(SCNAudioPlayer(source: victoryMusic))
+        self.scene.rootNode.addAudioPlayer(SCNAudioPlayer(source: victoryMusic))
         
-        self.overlay?.showEndScreen()
+        self.skScene?.showEndScreen()
     }
     
     // MARK: - Debug menu
     
     func fStopChanged(_ value: CGFloat) {
-        sceneRenderer!.pointOfView!.camera!.fStop = value
+        self.pointOfView!.camera!.fStop = value
     }
     
     func focusDistanceChanged(_ value: CGFloat) {
-        sceneRenderer!.pointOfView!.camera!.focusDistance = value
+        self.pointOfView!.camera!.focusDistance = value
     }
     
     func debugMenuSelectCameraAtIndex(_ index: Int) {
         if index == 0 {
-            let key = self.scene?.rootNode .childNode(withName: "key", recursively: true)
+            let key = self.scene.rootNode .childNode(withName: "key", recursively: true)
             key?.opacity = 1.0
         }
         self.setActiveCamera("CameraDof\(index)")

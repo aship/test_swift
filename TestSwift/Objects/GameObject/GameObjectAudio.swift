@@ -11,12 +11,12 @@ extension GameObject {
     // MARK: - Audio
     
     func playSound(_ audioName: AudioSourceKind) {
-        scene!.rootNode.addAudioPlayer(SCNAudioPlayer(source: audioSources[audioName.rawValue]))
+        scene.rootNode.addAudioPlayer(SCNAudioPlayer(source: audioSources[audioName.rawValue]))
     }
     
     func setupAudio() {
         // Get an arbitrary node to attach the sounds to.
-        let node = scene!.rootNode
+        let node = scene.rootNode
         
         // ambience
         if let audioSource = SCNAudioSource(named: "audio/ambience.mp3") {
@@ -27,7 +27,7 @@ extension GameObject {
             node.addAudioPlayer(SCNAudioPlayer(source: audioSource))
         }
         // volcano
-        if let volcanoNode = scene!.rootNode.childNode(withName: "particles_volcanoSmoke_v2", recursively: true) {
+        if let volcanoNode = scene.rootNode.childNode(withName: "particles_volcanoSmoke_v2", recursively: true) {
             if let audioSource = SCNAudioSource(named: "audio/volcano.mp3") {
                 audioSource.loops = true
                 audioSource.volume = 5.0

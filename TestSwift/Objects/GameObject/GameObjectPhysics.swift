@@ -9,8 +9,8 @@ import SceneKit
 
 extension GameObject {
     func setupPhysics() {
-        //make sure all objects only collide with the character
-        self.scene?.rootNode.enumerateHierarchy({(_ node: SCNNode, _ _: UnsafeMutablePointer<ObjCBool>) -> Void in
+        // make sure all objects only collide with the character
+        self.scene.rootNode.enumerateHierarchy({(_ node: SCNNode, _ _: UnsafeMutablePointer<ObjCBool>) -> Void in
             node.physicsBody?.collisionBitMask = Int(Bitmask.character.rawValue)
         })
     }
@@ -20,7 +20,7 @@ extension GameObject {
         let collisionsScene = SCNScene( named: "Art.scnassets/collision.scn" )
         collisionsScene!.rootNode.enumerateChildNodes { (_ child: SCNNode, _ _: UnsafeMutablePointer<ObjCBool>) in
             child.opacity = 0.0
-            self.scene?.rootNode.addChildNode(child)
+            self.scene.rootNode.addChildNode(child)
         }
     }
     

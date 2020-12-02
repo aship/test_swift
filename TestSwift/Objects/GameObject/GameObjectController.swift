@@ -5,26 +5,12 @@
 //  Created by aship on 2020/11/13.
 //
 
-import SceneKit
 import GameController
 import GameplayKit
+import SceneKit
 
 extension GameObject {
     // MARK: - GameObject
-    func setupGameObject() {
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(self.handleControllerDidConnect),
-            name: NSNotification.Name.GCControllerDidConnect, object: nil)
-        
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(self.handleControllerDidDisconnect),
-            name: NSNotification.Name.GCControllerDidDisconnect, object: nil)
-        guard let controller = GCController.controllers().first else {
-            return
-        }
-        
-        registerGameObject(controller)
-    }
     
     @objc
     func handleControllerDidConnect(_ notification: Notification) {
@@ -103,7 +89,7 @@ extension GameObject {
         
         #if os( iOS )
         if gamePadLeft != nil {
-            overlay!.hideVirtualPad()
+            self.skScene!.hideVirtualPad()
         }
         #endif
     }
@@ -113,7 +99,7 @@ extension GameObject {
         gamePadRight = nil
         gamePadCurrent = nil
         #if os( iOS )
-        overlay!.showVirtualPad()
+        self.skScene!.showVirtualPad()
         #endif
     }
 }

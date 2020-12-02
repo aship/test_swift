@@ -9,17 +9,21 @@ extension GameObject {
     // MARK: - ButtonOverlayDelegate
     
     func willPress(_ button: ButtonOverlay) {
-        if button == overlay!.controlOverlay!.buttonA {
+        print("WillPress")
+        
+        if button == self.skScene!.controlOverlay!.buttonA {
             controllerJump(true)
         }
         
-        if button == overlay!.controlOverlay!.buttonB {
+        if button == self.skScene!.controlOverlay!.buttonB {
             controllerAttack()
         }
     }
     
     func didPress(_ button: ButtonOverlay) {
-        if button == overlay!.controlOverlay!.buttonA {
+        print("DidPress")
+        
+        if button == self.skScene!.controlOverlay!.buttonA {
             controllerJump(false)
         }
     }

@@ -4,7 +4,7 @@
  
  Abstract:
  This class manages the main character, including its animations, sounds and direction.
-*/
+ */
 
 import Foundation
 import SceneKit
@@ -22,7 +22,7 @@ class Character: NSObject {
     
     static let speedFactor: CGFloat = 2.0
     static let stepsCount = 10
-
+    
     static let initialPosition = SIMD3<Float>(0.1, -0.2, 0)
     
     // some constants
@@ -81,13 +81,13 @@ class Character: NSObject {
     var whiteSmokeEmitter: SCNParticleSystem!
     var spinParticle: SCNParticleSystem!
     var spinCircleParticle: SCNParticleSystem!
-
+    
     var spinParticleAttach: SCNNode!
-
+    
     var fireEmitterBirthRate: CGFloat = 0.0
     var smokeEmitterBirthRate: CGFloat = 0.0
     var whiteSmokeEmitterBirthRate: CGFloat = 0.0
-
+    
     // Sound effects
     var aahSound: SCNAudioSource!
     var ouchSound: SCNAudioSource!
@@ -98,7 +98,7 @@ class Character: NSObject {
     var jumpSound: SCNAudioSource!
     var attackSound: SCNAudioSource!
     var steps = [SCNAudioSource](repeating: SCNAudioSource(),
-                                         count: Character.stepsCount )
+                                 count: Character.stepsCount )
     
     private(set) var offsetedMark: SCNNode?
     
@@ -123,8 +123,8 @@ class Character: NSObject {
                     SCNAction.repeatForever(SCNAction.sequence([
                         SCNAction.fadeOpacity(to: 0.01, duration: 0.1),
                         SCNAction.fadeOpacity(to: 1.0, duration: 0.1)
-                        ]))
                     ]))
+                ]))
                 whiteSmokeEmitter.birthRate = 0
                 fireEmitter.birthRate = fireEmitterBirthRate
                 smokeEmitter.birthRate = smokeEmitterBirthRate
@@ -178,14 +178,17 @@ class Character: NSObject {
         }
     }
     
+    var isAttacking: Bool {
+        return attackCount > 0
+    }
+    
     var node: SCNNode! {
         return characterNode
     }
-        
-    // MARK: - Initialization
+    
     override init() {
         super.init()
-
+        
         loadCharacter()
         loadParticles()
         loadSounds()

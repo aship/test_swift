@@ -21,11 +21,7 @@ extension Character {
         }
         return animationPlayer
     }
-    
-    var isAttacking: Bool {
-        return attackCount > 0
-    }
-    
+        
     func attack() {
         attackCount += 1
         model.animationPlayer(forKey: "spin")?.play()
