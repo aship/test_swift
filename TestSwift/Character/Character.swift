@@ -16,9 +16,79 @@ enum GroundType: Int {
     case count
 }
 
-private typealias ParticleEmitter = (node: SCNNode, particleSystem: SCNParticleSystem, birthRate: CGFloat)
+typealias ParticleEmitter = (node: SCNNode,
+                                     particleSystem: SCNParticleSystem,
+                                     birthRate: CGFloat)
 
 class Character {
+    // MARK: Retrieving nodes
+    
+    let node = SCNNode()
+    
+    // MARK: Controlling the character
+    
+    static let speedFactor = Float(1.538)
+    
+    var groundType = GroundType.inTheAir
+    var previousUpdateTime = TimeInterval(0.0)
+    var accelerationY = SCNFloat(0.0) // Simulate gravity
+    
+    var directionAngle: SCNFloat = 0.0 {
+        didSet {
+            if directionAngle != oldValue {
+                node.runAction(SCNAction.rotateTo(x: 0.0,
+                                                  y: CGFloat(directionAngle),
+                                                  z: 0.0,
+                                                  duration: 0.1,
+                                                  usesShortestUnitArc: true))
+            }
+        }
+    }
+    
+    var isBurning = false
+    var isInvincible = false
+    
+    var fireEmitter: ParticleEmitter! = nil
+    var smokeEmitter: ParticleEmitter! = nil
+    var whiteSmokeEmitter: ParticleEmitter! = nil
+    
+    // MARK: Animating the character
+    
+    var walkAnimation: CAAnimation!
+    
+    var isWalking: Bool = false {
+        didSet {
+            if oldValue != isWalking {
+                // Update node animation.
+                if isWalking {
+                    node.addAnimation(walkAnimation, forKey: "walk")
+                } else {
+                    node.removeAnimation(forKey: "walk", fadeOutDuration: 0.2)
+                }
+            }
+        }
+    }
+    
+    var walkSpeed: Float = 1.0 {
+        didSet {
+            // remove current walk animation if any.
+            let wasWalking = isWalking
+            if wasWalking {
+                isWalking = false
+            }
+
+            walkAnimation.speed = Character.speedFactor * walkSpeed
+            
+            // restore walk animation if needed.
+            isWalking = wasWalking
+        }
+    }
+    
+    var reliefSound: SCNAudioSource
+    var haltFireSound: SCNAudioSource
+    var catchFireSound: SCNAudioSource
+    
+    var steps = [[SCNAudioSource]](repeating: [], count: GroundType.count.rawValue)
     
     // MARK: Initialization
     
@@ -33,6 +103,9 @@ class Character {
         let characterTopLevelNode = characterScene.rootNode.childNodes[0]
         node.addChildNode(characterTopLevelNode)
         
+        print("characterTopLevelNode NEMAEEEE \(String(describing: characterTopLevelNode.name))")
+        print("node.position \(node.position)")
+        print("characterTopLevelNode.position \(characterTopLevelNode.position)")
         
         // MARK: Configure collision capsule
         
@@ -46,8 +119,14 @@ class Character {
         let characterCollisionNode = SCNNode()
         characterCollisionNode.name = "collider"
         characterCollisionNode.position = SCNVector3(0.0, collisionCapsuleHeight * 0.51, 0.0) // a bit too high so that the capsule does not hit the floor
-        characterCollisionNode.physicsBody = SCNPhysicsBody(type: .kinematic, shape:SCNPhysicsShape(geometry: SCNCapsule(capRadius: collisionCapsuleRadius, height: collisionCapsuleHeight), options:nil))
-        characterCollisionNode.physicsBody!.contactTestBitMask = BitmaskSuperCollectable | BitmaskCollectable | BitmaskCollision | BitmaskEnemy
+        
+        characterCollisionNode.physicsBody = SCNPhysicsBody(type: .kinematic,
+                                                            shape:SCNPhysicsShape(geometry: SCNCapsule(capRadius: collisionCapsuleRadius, height: collisionCapsuleHeight), options:nil))
+        
+        characterCollisionNode.physicsBody!.contactTestBitMask = BitmaskSuperCollectable |
+                                                                BitmaskCollectable |
+                                                                BitmaskCollision |
+                                                                BitmaskEnemy
         node.addChildNode(characterCollisionNode)
         
         
@@ -120,227 +199,4 @@ class Character {
             SCNAnimationEvent(keyTime: 0.1) { (_, _, _) in self.playFootStep() },
             SCNAnimationEvent(keyTime: 0.6) { (_, _, _) in self.playFootStep() }]
     }
-    
-    // MARK: Retrieving nodes
-    
-    let node = SCNNode()
-    
-    // MARK: Controlling the character
-    
-    static let speedFactor = Float(1.538)
-    
-    private var groundType = GroundType.inTheAir
-    private var previousUpdateTime = TimeInterval(0.0)
-    private var accelerationY = SCNFloat(0.0) // Simulate gravity
-    
-    private var directionAngle: SCNFloat = 0.0 {
-        didSet {
-            if directionAngle != oldValue {
-                node.runAction(SCNAction.rotateTo(x: 0.0, y: CGFloat(directionAngle), z: 0.0, duration: 0.1, usesShortestUnitArc: true))
-            }
-        }
-    }
-    
-    func walkInDirection(_ direction: SIMD3<Float>, time: TimeInterval, scene: SCNScene, groundTypeFromMaterial: (SCNMaterial) -> GroundType) -> SCNNode? {
-        // delta time since last update
-        if previousUpdateTime == 0.0 {
-            previousUpdateTime = time
-        }
-        
-        let deltaTime = Float(min(time - previousUpdateTime, 1.0 / 60.0))
-        let characterSpeed = deltaTime * Character.speedFactor * 0.84
-        previousUpdateTime = time
-        
-        let initialPosition = node.position
-        
-        // move
-        if direction.x != 0.0 && direction.z != 0.0 {
-            // move character
-            let position = SIMD3<Float>(node.position)
-            node.position = SCNVector3(position + direction * characterSpeed)
-            
-            // update orientation
-            directionAngle = SCNFloat(atan2(direction.x, direction.z))
-            
-            isWalking = true
-        }
-        else {
-            isWalking = false
-        }
-        
-        // Update the altitude of the character
-        
-        var position = node.position
-        var p0 = position
-        var p1 = position
-        
-        let maxRise = SCNFloat(0.08)
-        let maxJump = SCNFloat(10.0)
-        p0.y -= maxJump
-        p1.y += maxRise
-        
-        // Do a vertical ray intersection
-        var groundNode: SCNNode?
-        let results = scene.physicsWorld.rayTestWithSegment(from: p1, to: p0, options:[.collisionBitMask: BitmaskCollision | BitmaskWater, .searchMode: SCNPhysicsWorld.TestSearchMode.closest])
-        
-        if let result = results.first {
-            var groundAltitude = result.worldCoordinates.y
-            groundNode = result.node
-            
-            let groundMaterial = result.node.childNodes[0].geometry!.firstMaterial!
-            groundType = groundTypeFromMaterial(groundMaterial)
-            
-            if groundType == .water {
-                if isBurning {
-                    haltFire()
-                }
-                
-                // do a new ray test without the water to get the altitude of the ground (under the water).
-                let results = scene.physicsWorld.rayTestWithSegment(from: p1, to: p0, options:[.collisionBitMask: BitmaskCollision, .searchMode: SCNPhysicsWorld.TestSearchMode.closest])
-                
-                let result = results[0]
-                groundAltitude = result.worldCoordinates.y
-            }
-            
-            let threshold = SCNFloat(1e-5)
-            let gravityAcceleration = SCNFloat(0.18)
-            
-            if groundAltitude < position.y - threshold {
-                accelerationY += SCNFloat(deltaTime) * gravityAcceleration // approximation of acceleration for a delta time.
-                if groundAltitude < position.y - 0.2 {
-                    groundType = .inTheAir
-                }
-            }
-            else {
-                accelerationY = 0
-            }
-            
-            position.y -= accelerationY
-            
-            // reset acceleration if we touch the ground
-            if groundAltitude > position.y {
-                accelerationY = 0
-                position.y = groundAltitude
-            }
-            
-            // Finally, update the position of the character.
-            node.position = position
-            
-        }
-        else {
-            // no result, we are probably out the bounds of the level -> revert the position of the character.
-            node.position = initialPosition
-        }
-        
-        return groundNode
-    }
-    
-    // MARK: Animating the character
-    
-    private var walkAnimation: CAAnimation!
-    
-    private var isWalking: Bool = false {
-        didSet {
-            if oldValue != isWalking {
-                // Update node animation.
-                if isWalking {
-                    node.addAnimation(walkAnimation, forKey: "walk")
-                } else {
-                    node.removeAnimation(forKey: "walk", fadeOutDuration: 0.2)
-                }
-            }
-        }
-    }
-    
-    private var walkSpeed: Float = 1.0 {
-        didSet {
-            // remove current walk animation if any.
-            let wasWalking = isWalking
-            if wasWalking {
-                isWalking = false
-            }
-
-            walkAnimation.speed = Character.speedFactor * walkSpeed
-            
-            // restore walk animation if needed.
-            isWalking = wasWalking
-        }
-    }
-    
-    // MARK: Dealing with fire
-    
-    private var isBurning = false
-    private var isInvincible = false
-    
-    private var fireEmitter: ParticleEmitter! = nil
-    private var smokeEmitter: ParticleEmitter! = nil
-    private var whiteSmokeEmitter: ParticleEmitter! = nil
-    
-    func catchFire() {
-        if isInvincible == false {
-            isInvincible = true
-            node.runAction(SCNAction.sequence([
-                SCNAction.playAudio(catchFireSound, waitForCompletion: false),
-                SCNAction.repeat(SCNAction.sequence([
-                    SCNAction.fadeOpacity(to: 0.01, duration: 0.1),
-                    SCNAction.fadeOpacity(to: 1.0, duration: 0.1)
-                    ]), count: 7),
-                SCNAction.run { _ in self.isInvincible = false } ]))
-        }
-        
-        isBurning = true
-        
-        // start fire + smoke
-        fireEmitter.particleSystem.birthRate = fireEmitter.birthRate
-        smokeEmitter.particleSystem.birthRate = smokeEmitter.birthRate
-        
-        // walk faster
-        walkSpeed = 2.3
-    }
-    
-    func haltFire() {
-        if isBurning {
-            isBurning = false
-            
-            node.runAction(SCNAction.sequence([
-                SCNAction.playAudio(haltFireSound, waitForCompletion: true),
-                SCNAction.playAudio(reliefSound, waitForCompletion: false)])
-            )
-            
-            // stop fire and smoke
-            fireEmitter.particleSystem.birthRate = 0
-            SCNTransaction.animateWithDuration(1.0) {
-                self.smokeEmitter.particleSystem.birthRate = 0
-            }
-            
-            // start white smoke
-            whiteSmokeEmitter.particleSystem.birthRate = whiteSmokeEmitter.birthRate
-            
-            // progressively stop white smoke
-            SCNTransaction.animateWithDuration(5.0) {
-                self.whiteSmokeEmitter.particleSystem.birthRate = 0
-            }
-            
-            // walk normally
-            walkSpeed = 1.0
-        }
-    }
-    
-    // MARK: Dealing with sound
-    
-    private var reliefSound: SCNAudioSource
-    private var haltFireSound: SCNAudioSource
-    private var catchFireSound: SCNAudioSource
-    
-    private var steps = [[SCNAudioSource]](repeating: [], count: GroundType.count.rawValue)
-    
-    private func playFootStep() {
-        if groundType != .inTheAir { // We are in the air, no sound to play.
-            // Play a random step sound.
-            let soundsCount = steps[groundType.rawValue].count
-            let stepSoundIndex = Int(arc4random_uniform(UInt32(soundsCount)))
-            node.runAction(SCNAction.playAudio(steps[groundType.rawValue][stepSoundIndex], waitForCompletion: false))
-        }
-    }
-    
 }

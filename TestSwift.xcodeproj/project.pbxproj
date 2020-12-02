@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA01F464256FD8B8001E356E /* CharacterEtc.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA01F463256FD8B8001E356E /* CharacterEtc.swift */; };
+		AA01F469256FE0B5001E356E /* CharacterWalk.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA01F468256FE0B5001E356E /* CharacterWalk.swift */; };
 		AA0776782560F48100E15153 /* GameSKScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0776772560F48100E15153 /* GameSKScene.swift */; };
 		AA210317255FCFD300F6EDC9 /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA210314255FCFD200F6EDC9 /* Character.swift */; };
-		AA210318255FCFD300F6EDC9 /* SceneObjectExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA210315255FCFD200F6EDC9 /* SceneObjectExtension.swift */; };
+		AA210318255FCFD300F6EDC9 /* SceneObjectDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA210315255FCFD200F6EDC9 /* SceneObjectDirection.swift */; };
 		AA210319255FCFD300F6EDC9 /* SceneKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA210316255FCFD300F6EDC9 /* SceneKitExtensions.swift */; };
 		AA210325255FD00600F6EDC9 /* ItemsPearl.png in Resources */ = {isa = PBXBuildFile; fileRef = AA21031E255FD00600F6EDC9 /* ItemsPearl.png */; };
 		AA210326255FD00600F6EDC9 /* FlowerEmpty.png in Resources */ = {isa = PBXBuildFile; fileRef = AA21031F255FD00600F6EDC9 /* FlowerEmpty.png */; };
@@ -23,11 +25,18 @@
 		AA210336255FD01800F6EDC9 /* glow01.png in Resources */ = {isa = PBXBuildFile; fileRef = AA210332255FD01800F6EDC9 /* glow01.png */; };
 		AA210337255FD01800F6EDC9 /* confetti.png in Resources */ = {isa = PBXBuildFile; fileRef = AA210333255FD01800F6EDC9 /* confetti.png */; };
 		AA21033C255FD02200F6EDC9 /* game.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = AA21033B255FD02200F6EDC9 /* game.scnassets */; };
-		AA210341255FD1B900F6EDC9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA210340255FD1B900F6EDC9 /* AppDelegate.swift */; };
 		AA210347255FD23900F6EDC9 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA210346255FD23900F6EDC9 /* Constant.swift */; };
 		AA21034F255FD25600F6EDC9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA21034E255FD25600F6EDC9 /* ContentView.swift */; };
-		AA210355255FD26400F6EDC9 /* GameSCNView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA210353255FD26400F6EDC9 /* GameSCNView.swift */; };
 		AA210356255FD26400F6EDC9 /* SceneObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA210354255FD26400F6EDC9 /* SceneObject.swift */; };
+		AA30894A256D34FF001CCA2F /* SceneObjectCaracter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA308949256D34FF001CCA2F /* SceneObjectCaracter.swift */; };
+		AA30894F256D36E5001CCA2F /* SceneObjectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA30894E256D36E5001CCA2F /* SceneObjectRenderer.swift */; };
+		AA308954256D3723001CCA2F /* SceneObjectPhysics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA308953256D3723001CCA2F /* SceneObjectPhysics.swift */; };
+		AA308959256D375D001CCA2F /* SceneObjectSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA308958256D375D001CCA2F /* SceneObjectSetup.swift */; };
+		AA30895E256D37EF001CCA2F /* SceneObjectCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA30895D256D37EF001CCA2F /* SceneObjectCamera.swift */; };
+		AA308963256D38C4001CCA2F /* SceneObjectCongras.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA308962256D38C4001CCA2F /* SceneObjectCongras.swift */; };
+		AA308968256D38FB001CCA2F /* SceneObjectCollect.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA308967256D38FB001CCA2F /* SceneObjectCollect.swift */; };
+		AA308973256D39A7001CCA2F /* GameSKSceneEx.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA308972256D39A7001CCA2F /* GameSKSceneEx.swift */; };
+		AA308981256D4417001CCA2F /* SceneObjectSetupCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA308980256D4417001CCA2F /* SceneObjectSetupCamera.swift */; };
 		AA691285255F61F800EE4849 /* TestSwiftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA691284255F61F800EE4849 /* TestSwiftApp.swift */; };
 		AA691289255F61F900EE4849 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA691288255F61F900EE4849 /* Assets.xcassets */; };
 		AA69128C255F61F900EE4849 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA69128B255F61F900EE4849 /* Preview Assets.xcassets */; };
@@ -53,9 +62,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AA01F463256FD8B8001E356E /* CharacterEtc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterEtc.swift; sourceTree = "<group>"; };
+		AA01F468256FE0B5001E356E /* CharacterWalk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterWalk.swift; sourceTree = "<group>"; };
 		AA0776772560F48100E15153 /* GameSKScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSKScene.swift; sourceTree = "<group>"; };
 		AA210314255FCFD200F6EDC9 /* Character.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Character.swift; sourceTree = "<group>"; };
-		AA210315255FCFD200F6EDC9 /* SceneObjectExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneObjectExtension.swift; sourceTree = "<group>"; };
+		AA210315255FCFD200F6EDC9 /* SceneObjectDirection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneObjectDirection.swift; sourceTree = "<group>"; };
 		AA210316255FCFD300F6EDC9 /* SceneKitExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneKitExtensions.swift; sourceTree = "<group>"; };
 		AA21031E255FD00600F6EDC9 /* ItemsPearl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ItemsPearl.png; sourceTree = "<group>"; };
 		AA21031F255FD00600F6EDC9 /* FlowerEmpty.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FlowerEmpty.png; sourceTree = "<group>"; };
@@ -69,11 +80,18 @@
 		AA210332255FD01800F6EDC9 /* glow01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = glow01.png; sourceTree = "<group>"; };
 		AA210333255FD01800F6EDC9 /* confetti.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = confetti.png; sourceTree = "<group>"; };
 		AA21033B255FD02200F6EDC9 /* game.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = game.scnassets; sourceTree = "<group>"; };
-		AA210340255FD1B900F6EDC9 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA210346255FD23900F6EDC9 /* Constant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		AA21034E255FD25600F6EDC9 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		AA210353255FD26400F6EDC9 /* GameSCNView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameSCNView.swift; sourceTree = "<group>"; };
 		AA210354255FD26400F6EDC9 /* SceneObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneObject.swift; sourceTree = "<group>"; };
+		AA308949256D34FF001CCA2F /* SceneObjectCaracter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneObjectCaracter.swift; sourceTree = "<group>"; };
+		AA30894E256D36E5001CCA2F /* SceneObjectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneObjectRenderer.swift; sourceTree = "<group>"; };
+		AA308953256D3723001CCA2F /* SceneObjectPhysics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneObjectPhysics.swift; sourceTree = "<group>"; };
+		AA308958256D375D001CCA2F /* SceneObjectSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneObjectSetup.swift; sourceTree = "<group>"; };
+		AA30895D256D37EF001CCA2F /* SceneObjectCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneObjectCamera.swift; sourceTree = "<group>"; };
+		AA308962256D38C4001CCA2F /* SceneObjectCongras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneObjectCongras.swift; sourceTree = "<group>"; };
+		AA308967256D38FB001CCA2F /* SceneObjectCollect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneObjectCollect.swift; sourceTree = "<group>"; };
+		AA308972256D39A7001CCA2F /* GameSKSceneEx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSKSceneEx.swift; sourceTree = "<group>"; };
+		AA308980256D4417001CCA2F /* SceneObjectSetupCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneObjectSetupCamera.swift; sourceTree = "<group>"; };
 		AA691281255F61F800EE4849 /* TestSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA691284255F61F800EE4849 /* TestSwiftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSwiftApp.swift; sourceTree = "<group>"; };
 		AA691288255F61F900EE4849 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -116,7 +134,6 @@
 			isa = PBXGroup;
 			children = (
 				AA691284255F61F800EE4849 /* TestSwiftApp.swift */,
-				AA210340255FD1B900F6EDC9 /* AppDelegate.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -133,7 +150,15 @@
 			isa = PBXGroup;
 			children = (
 				AA210354255FD26400F6EDC9 /* SceneObject.swift */,
-				AA210315255FCFD200F6EDC9 /* SceneObjectExtension.swift */,
+				AA308958256D375D001CCA2F /* SceneObjectSetup.swift */,
+				AA308980256D4417001CCA2F /* SceneObjectSetupCamera.swift */,
+				AA30895D256D37EF001CCA2F /* SceneObjectCamera.swift */,
+				AA308953256D3723001CCA2F /* SceneObjectPhysics.swift */,
+				AA30894E256D36E5001CCA2F /* SceneObjectRenderer.swift */,
+				AA308949256D34FF001CCA2F /* SceneObjectCaracter.swift */,
+				AA210315255FCFD200F6EDC9 /* SceneObjectDirection.swift */,
+				AA308967256D38FB001CCA2F /* SceneObjectCollect.swift */,
+				AA308962256D38C4001CCA2F /* SceneObjectCongras.swift */,
 			);
 			path = Objects;
 			sourceTree = "<group>";
@@ -171,14 +196,6 @@
 			path = Constants;
 			sourceTree = "<group>";
 		};
-		AA22CBC325609BDE0080D3FC /* SCNView */ = {
-			isa = PBXGroup;
-			children = (
-				AA210353255FD26400F6EDC9 /* GameSCNView.swift */,
-			);
-			path = SCNView;
-			sourceTree = "<group>";
-		};
 		AA22CBC425609BF10080D3FC /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -191,6 +208,8 @@
 			isa = PBXGroup;
 			children = (
 				AA210314255FCFD200F6EDC9 /* Character.swift */,
+				AA01F468256FE0B5001E356E /* CharacterWalk.swift */,
+				AA01F463256FD8B8001E356E /* CharacterEtc.swift */,
 			);
 			path = Character;
 			sourceTree = "<group>";
@@ -199,6 +218,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0776772560F48100E15153 /* GameSKScene.swift */,
+				AA308972256D39A7001CCA2F /* GameSKSceneEx.swift */,
 			);
 			path = SKScene;
 			sourceTree = "<group>";
@@ -229,7 +249,6 @@
 				AA210311255FCF9900F6EDC9 /* App */,
 				AA210345255FD22200F6EDC9 /* Constants */,
 				AA210312255FCFA900F6EDC9 /* Views */,
-				AA22CBC325609BDE0080D3FC /* SCNView */,
 				AA210313255FCFC200F6EDC9 /* Objects */,
 				AA51C21B25615CBC00EA1A2E /* SKScene */,
 				AA22CBC425609BF10080D3FC /* Extensions */,
@@ -412,15 +431,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA210347255FD23900F6EDC9 /* Constant.swift in Sources */,
-				AA210341255FD1B900F6EDC9 /* AppDelegate.swift in Sources */,
 				AA21034F255FD25600F6EDC9 /* ContentView.swift in Sources */,
 				AA210317255FCFD300F6EDC9 /* Character.swift in Sources */,
 				AA210356255FD26400F6EDC9 /* SceneObject.swift in Sources */,
 				AA210319255FCFD300F6EDC9 /* SceneKitExtensions.swift in Sources */,
+				AA30895E256D37EF001CCA2F /* SceneObjectCamera.swift in Sources */,
+				AA30894A256D34FF001CCA2F /* SceneObjectCaracter.swift in Sources */,
+				AA308981256D4417001CCA2F /* SceneObjectSetupCamera.swift in Sources */,
+				AA308954256D3723001CCA2F /* SceneObjectPhysics.swift in Sources */,
+				AA308963256D38C4001CCA2F /* SceneObjectCongras.swift in Sources */,
+				AA308973256D39A7001CCA2F /* GameSKSceneEx.swift in Sources */,
+				AA308959256D375D001CCA2F /* SceneObjectSetup.swift in Sources */,
+				AA01F464256FD8B8001E356E /* CharacterEtc.swift in Sources */,
+				AA30894F256D36E5001CCA2F /* SceneObjectRenderer.swift in Sources */,
 				AA0776782560F48100E15153 /* GameSKScene.swift in Sources */,
 				AA691285255F61F800EE4849 /* TestSwiftApp.swift in Sources */,
-				AA210355255FD26400F6EDC9 /* GameSCNView.swift in Sources */,
-				AA210318255FCFD300F6EDC9 /* SceneObjectExtension.swift in Sources */,
+				AA308968256D38FB001CCA2F /* SceneObjectCollect.swift in Sources */,
+				AA01F469256FE0B5001E356E /* CharacterWalk.swift in Sources */,
+				AA210318255FCFD300F6EDC9 /* SceneObjectDirection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
