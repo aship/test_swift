@@ -8,75 +8,63 @@
 
 import SpriteKit
 
-class GameScene: SKScene, CharacterDelegate {
-    // すべてのタイルを保持する配列
-    var tileMap = [Tile]()
-    // 花のタイルを保持する辞書
-    var flowerMap = [Int: SKSpriteNode]()
-    // タイルの表示上のサイズ
-    var tileSize = CGSize(width: 10.0, height: 10.0)
-    // マップの横方向のタイル数
-    var mapWidth = 0
-    // マップの縦方向のタイル数
-    var mapHeight = 0
+class GameScene: SKScene {
     
-    // プレイヤー
-    var player: Player?
-    // 敵
-    var enemies = [Enemy]()
+    let gameLayer = SKNode()
+    let disksLayer = SKNode()
     
-    // スコア用ラベル
-    var scoreLabel: SKLabelNode?
-    // スコア
-    var score = 0
+    var diskNodes = Array2D<SKSpriteNode>(rows: BoardSize, columns: BoardSize)
+    var board: Board!
+    var nextColor: CellState!
+    
+    let blackScoreLabel = SKLabelNode.createScoreLabel(x: 150, y: -260)
+    let whiteScoreLabel = SKLabelNode.createScoreLabel(x: 150, y: -310)
+    
+    var gameResultLayer: SKNode?
+    
+    var switchTurnHandler: (() -> ())?
+    
+    var cpu: ComputerPlayer!
     
     override func sceneDidLoad() {
         self.scaleMode = .resizeFill
-        self.anchorPoint = CGPoint(x: 0.0,
-                                   y: 0.0)
+        self.anchorPoint = CGPoint(x: 0.5,
+                                   y: 0.5)
     }
-    
+
     override func didMove(to view: SKView) {
-        // 背景画像のスプライトを貼り付ける
-        let backgroundSprite = SKSpriteNode(imageNamed: "background")
-        backgroundSprite.size = CGSize(width: screenWidth,
-                                       height: screenHeight)
-        backgroundSprite.position = CGPoint(x: screenWidth * 0.5,
-                                            y: screenHeight * 0.5)
-        self.addChild(backgroundSprite)
+        // 基準点を中心に設定
+        //   super.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         
-        // マップを描画する
-        self.drawMap()
-        // プレイヤーを作成する
-        self.createPlayer(firstPosition: TilePosition(x: 0, y: 2))
-        // 敵を作成する
-        self.createEnemy(firstPosition: TilePosition(x: 5, y: 5))
-        self.createEnemy(firstPosition: TilePosition(x: 10, y: 5))
+        // 背景の設定
+        let background = SKSpriteNode(imageNamed: "background")
+        //background.size = self.size
+        background.size = CGSize(width: screenWidth,
+                                 height: screenHeight)
         
-        // スコアボードを設置する
-        let houseSprite = SKSpriteNode(imageNamed: "house")
-        houseSprite.size = CGSize(width: 143, height: 91)
-        houseSprite.position = CGPoint(x: screenWidth-71, y: 45)
-        houseSprite.zPosition = 1   // 他のノードより手前に表示する
-        self.addChild(houseSprite)
+        self.addChild(background)
+        self.addChild(self.gameLayer)
         
-        // スコアのラベルを設置する
-        let scoreLabel = SKLabelNode(fontNamed: "Helvetica")
-        scoreLabel.text = "0"
-        scoreLabel.fontSize = 32
-        scoreLabel.position = CGPoint(x: screenWidth-60, y: 40)
-        scoreLabel.fontColor = UIColor.black
-        scoreLabel.zPosition = 1
-        self.addChild(scoreLabel)
-        self.scoreLabel = scoreLabel
+        // anchorPointからの相対位置
+        let layerPosition = CGPoint(
+            x: -SquareWidth * CGFloat(BoardSize) / 2,
+            y: -SquareHeight * CGFloat(BoardSize) / 2 + CentralDeltaY
+        )
         
-        // "points"ラベルを設置する
-        let pointsLabel = SKLabelNode(fontNamed: "Helvetica")
-        pointsLabel.text = "points"
-        pointsLabel.fontSize = 18
-        pointsLabel.position = CGPoint(x: screenWidth-60, y: 20)
-        pointsLabel.fontColor = UIColor.black
-        pointsLabel.zPosition = 1
-        self.addChild(pointsLabel)
+        self.gameLayer.addChild(self.blackScoreLabel)
+        self.gameLayer.addChild(self.whiteScoreLabel)
+        
+        self.disksLayer.position = layerPosition
+        self.gameLayer.addChild(self.disksLayer)
+        
+        
+        
+        let evaluate = countColor
+        let maxDepth = 2
+        let search = MiniMaxMethod(evaluate: evaluate, maxDepth: maxDepth)
+        self.cpu = ComputerPlayer(color: .white, search: search)
+        
+        self.switchTurnHandler = self.switchTurn
+        self.initBoard()
     }
 }

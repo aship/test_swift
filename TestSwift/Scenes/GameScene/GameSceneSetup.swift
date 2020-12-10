@@ -8,146 +8,121 @@
 import SpriteKit
 
 extension GameScene {
-    // マップを描画するメソッド
-    func drawMap() {
-        // CSVファイルのパスを求める
-        if let fileName = Bundle.main.path(forResource: "map", ofType: "csv") {
-            // マップを読み込む
-            self.loadMapData(fileName: fileName)
+    /// 盤の初期化
+    func initBoard() {
+        self.board = Board()
+        self.updateDiskNodes()
+        self.nextColor = .black
+    }
+    
+    /// 手を打つ
+    func makeMove(_ move: Move?) {
+        if move != nil {
+            // 盤上に手を打つ
+            self.board.makeMove(move!)
         }
-        
-        // タイルのスプライトをシーンに貼り付ける
-        for tile in self.tileMap {
-            self.addChild(tile)
-        }
-        
-        // 花のスプライトをシーンに貼り付ける
-        for (_, flowerSprite) in self.flowerMap {
-            self.addChild(flowerSprite)
+        // 今打った手とは反対の色にターンを変える
+        self.nextColor = self.nextColor.opponent
+        // 今打った石と返された石を画面上に表示
+        self.updateDiskNodes()
+        if self.board.hasGameFinished() {
+            // ゲーム終了時
+            self.showGameResult()
         }
     }
     
-    // マップデータを読み込むメソッド
-    func loadMapData(fileName:String) {
-        // ファイルをUTF-8エンコードの文字列として読み込む
-        let fileString: String
-        do {
-            fileString = try String(contentsOfFile: fileName,
-                                    encoding: String.Encoding.utf8)
+    func switchTurn() {
+        if self.nextColor == self.cpu.color {
+            //  self.isUserInteractionEnabled = false
+            Timer.scheduledTimer(timeInterval: 0.3,
+                                 target: self,
+                                 selector: #selector(self.makeMoveByComputer),
+                                 userInfo: nil,
+                                 repeats: false)
         }
-        catch {
-            return
-        }
-
-        // 改行で区切って配列にする
-        let lineList = fileString.components(separatedBy: "\n")
-        // 配列の要素数(CSVファイルの行数)を縦方向のタイル数として保持
-        self.mapHeight = lineList.count
+    }
+    
+    /// コンピュータプレイヤーに一手打たせる
+    @objc func makeMoveByComputer() {
+        let nextMove = self.cpu.selectMove(self.board!)
+        self.makeMove(nextMove)
         
-        // 配列のインデックス
-        var index = 0
-
-        // 行ごとに処理を行う
-        for line in lineList {
-            // カンマで要素を分割する
-            let tileStringList = line.components(separatedBy: ",")
+        // プレイヤーが合法な手を打てない場合は、プレイヤーのターンをスキップする
+        if self.board.hasGameFinished() == false &&
+            self.board.existsValidMove(self.cpu.color.opponent) == false {
+            self.makeMoveByComputer()
+        }
+        //  self.isUserInteractionEnabled = true
+    }
+    
+    
+    func updateDiskNodes() {
+        
+        for (row, column, state) in self.board.cells {
             
-            if self.mapWidth == 0 {
-                // 配列の要素数を横方向のタイル数として保持
-                self.mapWidth = tileStringList.count
-                // タイルの幅を求める
-                let tileWidth = Double(screenWidth) * 0.9 / Double(self.mapWidth)
-                // タイルの大きさを控える
-                self.tileSize = CGSize(width: tileWidth,
-                                       height: tileWidth)
-            }
-            
-            // 行中の要素ごとに処理を行う
-            for tileString in tileStringList {
-                // 文字列をInt型に変換する
-                let value = Int(tileString)
-                // Int型の値をTileType型に変換する
-                if let type = TileType(rawValue: value!) {
-                    // インデックスからタイルの位置を求める
-                    let position = self.getTilePositionByIndex(index: index)
-                    
-                    // タイルを作成して配列に納める
-                    let tile = Tile(imageNamed: tileString)
-                    tile.position = self.getPointByTilePosition(position: position)
-                    tile.size = self.tileSize
-                    tile.type = type
-                    self.tileMap.append(tile)
-                    
-                    // タイルが花を置く条件にあてはまる場合
-                    if type == .Road1 || type == .Road2 {
-                        // 花のスプライトを作成して配列に納める
-                        let flowerSprite = SKSpriteNode(imageNamed: "flower")
-                        flowerSprite.size = tile.size
-                        flowerSprite.position = tile.position
-                        flowerSprite.anchorPoint = tile.anchorPoint
-                        self.flowerMap[index] = flowerSprite
+            if let imageName = DiskImageNames[state] {
+                if let prevNode = self.diskNodes[row, column] {
+                    if prevNode.userData?["state"] as! Int == state.rawValue {
+                        // 変化が無いセルはスキップする
+                        continue
                     }
+                    // 古いノードを削除
+                    prevNode.removeFromParent()
                 }
                 
-                index = index + 1
+                // 新しいノードをレイヤーに追加
+                let newNode = SKSpriteNode(imageNamed: imageName)
+                newNode.userData = ["state" : state.rawValue] as NSMutableDictionary
+                
+                newNode.size = CGSize(width: SquareWidth, height: SquareHeight)
+                newNode.position = self.convertPointOnLayer(row, column: column)
+                self.disksLayer.addChild(newNode)
+                
+                self.diskNodes[row, column] = newNode
             }
+        }
+        // スコア表示の更新
+        self.updateScores()
+    }
+    
+    /// ゲームをリスタートする
+    func restartGame() {
+        for (row, column, diskNode) in self.diskNodes {
+            diskNode.removeFromParent()
+            self.diskNodes[row, column] = nil
+        }
+        self.initBoard()
+    }
+    
+    /// 盤上での座標をレイヤー上での座標に変換する
+    func convertPointOnLayer(_ row: Int, column: Int) -> CGPoint {
+        return CGPoint(
+            x: CGFloat(column) * SquareWidth + SquareWidth / 2,
+            y: CGFloat(row) * SquareHeight + SquareHeight / 2
+        )
+    }
+    
+    /// レイヤー上での座標を盤上での座標に変換する
+    func convertPointOnBoard(_ point: CGPoint) -> (row: Int, column: Int)? {
+        print("point.x \(point.x)")
+        print("point.y \(point.y)")
+        
+        if 0 <= point.x && point.x < SquareWidth * CGFloat(BoardSize) &&
+            0 <= point.y && point.y < SquareHeight * CGFloat(BoardSize) {
+            
+            print("xxxx \(Int(point.y / SquareHeight))")
+            print("yyyy \(Int(point.x / SquareWidth))")
+            
+            return (Int(point.y / SquareHeight), Int(point.x / SquareWidth))
+        } else {
+            return nil
         }
     }
     
-    
-    // プレイヤー(赤ずきん)を作成するメソッド
-    func createPlayer(firstPosition:TilePosition) {
-        // テクスチャを二枚用意する
-        let akazukin1 = SKTexture(imageNamed: "akazukin01")
-        let akazukin2 = SKTexture(imageNamed: "akazukin02")
-        
-        // 一枚目のテクスチャでスプライトを作成する
-        let sprite = SKSpriteNode(texture: akazukin1)
-        sprite.size = CGSize(width: self.tileSize.width, height: self.tileSize.height)
-        sprite.position = self.getPointByTilePosition(position: firstPosition)
-        self.addChild(sprite)
-        
-        // 二枚のテクスチャでアニメーションを行う
-        let animation = SKAction.animate(with: [akazukin1, akazukin2], timePerFrame: 0.5)
-        let repeatAction = SKAction.repeatForever(animation)
-        sprite.run(repeatAction)
-        
-        // Playerクラスのオブジェクトを作成する
-        let player = Player()
-        player.delegate = self              // デリゲートにGameSceneを指定する
-        player.position = firstPosition
-        player.sprite = sprite
-        player.startMoving()                // 移動を開始する
-        self.player = player
-    }
-    
-    // 敵(オオカミ)を作成するメソッド
-    func createEnemy(firstPosition:TilePosition) {
-        // テクスチャを二枚用意する
-        let wolf1 = SKTexture(imageNamed: "wolf01")
-        let wolf2 = SKTexture(imageNamed: "wolf02")
-        
-        // 一枚目のテクスチャでスプライトを作成する
-        let sprite = SKSpriteNode(texture: wolf1)
-        sprite.size = CGSize(width: self.tileSize.width * 1.5,
-                             height: self.tileSize.height)    // タイルから少しはみ出るくらい横幅を確保する
-        sprite.position = self.getPointByTilePosition(position: firstPosition)
-        self.addChild(sprite)
-        
-        // 二枚のテクスチャでアニメーションを行う
-        let animation = SKAction.animate(with: [wolf1, wolf2], timePerFrame: 0.5)
-        let repeatAction = SKAction.repeatForever(animation)
-        sprite.run(repeatAction)
-        
-        // Enemyクラスのオブジェクトを作成する
-        let enemy = Enemy()
-        enemy.delegate = self               // デリゲートにGameSceneを指定する
-        enemy.position = firstPosition
-        enemy.sprite = sprite
-        // 移動を開始する
-        enemy.startMoving()
-        
-        self.enemies.append(enemy)
+    /// スコアを更新する
+    func updateScores() {
+        self.blackScoreLabel.text = String(self.board.countCells(.black))
+        self.whiteScoreLabel.text = String(self.board.countCells(.white))
     }
 }
 
