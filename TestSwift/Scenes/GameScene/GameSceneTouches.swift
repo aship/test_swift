@@ -10,69 +10,49 @@ import SpriteKit
 extension GameScene {
     override func touchesBegan(_ touches: Set<UITouch>,
                                with event: UIEvent?) {
-        //        print("touches begin")
-        //        print("baseNode.speed")
-        //        print(baseNode.speed)
-        
-        if baseNode.speed == 0 {
-            baseNode.speed = 1
-            player.physicsBody?.isDynamic = true
-        }
-        else if 0.0 < baseNode.speed {
-            // プレイヤーに加えられている力をゼロにする
-            player.physicsBody?.velocity = CGVector.zero
-            // プレイヤーにy軸方向へ力を加える
-            player.physicsBody?.applyImpulse(CGVector(dx: 0.0,
-                                                      dy: 16.0))
+        for touch: AnyObject in touches {
+            _ = touch.location(in: self)
             
+            //アームを上げる
+            let swingAction1 = SKAction.rotate(byAngle: CGFloat(-Double.pi * 0.25), duration:0.05)
+            let swingAction2 = SKAction.rotate(byAngle: CGFloat(Double.pi * 0.25), duration:0.05)
+            armRight.run(swingAction1)
+            armLeft.run(swingAction2)
         }
         
-        return
-        
-        
-        
-        if 0.0 < baseNode.speed {
-            // ゲーム進行中のとき
-            for touch in touches {
-                _ = touch.location(in: self)
-                
-                
-                print("basenode spped 1")
-                
-                // プレイヤーに加えられている力をゼロにする
-                player.physicsBody?.velocity = CGVector.zero
-                // プレイヤーにy軸方向へ力を加える
-                player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 10.0))
-            }
-        } else if baseNode.speed == 0.0 && player.speed == 0.0 {
-            print("GAME OVERR")
-            // ゲームオーバー時はリスタート
-            // 障害物を全て取り除く
-            coralNode.removeAllChildren()
-            
-            // スコアをリセット
-            score = 0
-            scoreLabelNode.text = String(score)
-            
-            // プレイキャラを再配置
-            player.position = CGPoint(x: screenWidth * 0.35,
-                                      y: self.frame.size.height * 0.6)
-            player.physicsBody?.velocity = CGVector.zero
-            player.physicsBody?.collisionBitMask = ColliderType.World | ColliderType.Coral
-            player.zRotation = 0.0
-            
-            // アニメーションを開始
-            player.speed = 1.0
-            baseNode.speed = 1.0
+        //ゲームオーバーだったらスタート位置に戻す
+        if gameoverFlg == true {
+            self.reset()
         }
-        else if baseNode.speed == 0.0 {
-            player.physicsBody?.isDynamic = true
-            baseNode.speed = 1.0
+    }
+    
+    func reset(){
+        //ゲームオーバーフラグをもどす
+        gameoverFlg = false
+        
+        //ゲームオーバーラベルを削除
+        gameoverLabel.removeFromParent()
+        
+        //ボールを削除して作り直す
+        ball.removeFromParent()
+        self.makeBall()
+        
+        //得点を0にもどす
+        count = 0
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>,
+                               with event: UIEvent?) {
+        for touch: AnyObject in touches {
+            _ = touch.location(in: self)
             
-            // プレイヤーに加えられている力をゼロにする
-            player.physicsBody?.velocity = CGVector.zero
-            // プレイヤーにy軸方向へ力を加える
-            player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 10.0))
+            //アームを下げる
+            let swingAction1 = SKAction.rotate(byAngle: CGFloat(-Double.pi * 0.25),
+                                               duration:0.05)
+            let swingAction2 = SKAction.rotate(byAngle: CGFloat(Double.pi * 0.25),
+                                               duration:0.05)
+            armRight.run(swingAction2)
+            armLeft.run(swingAction1)
         }
     }
 }
