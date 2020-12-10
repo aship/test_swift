@@ -9,123 +9,89 @@ import SpriteKit
 
 extension GameScene {
     func didBegin(_ contact: SKPhysicsContact) {
-        
-        
+        let bodyNameA: String = contact.bodyA.node!.name!
         let bodyNameB: String = contact.bodyB.node!.name!
         
-        //その他の車に接触
-        if bodyNameB.isEqual(kOtherCarName) {
-            
-            //    print("DID OTHER CAR")
-            
-            
-            let road: SKNode = self.childNode(withName: kRoadName)!
-            let pt: CGPoint = self.convert(contact.contactPoint, to: road)
-            self.makeFireParticle(pt)
-            self.makeSmokeParticle(pt)
-            //ゲームオーバー
-            self.showGameOver()
-        }
+     //   print(String(format: "A=%@ B=%@ Impulse=%.3f",
+           //          bodyNameA,bodyNameB,contact.collisionImpulse))
         
-        //プレイヤーカーが壁に接触
-        if bodyNameB.isEqual(kPlayerCarName) {
+        // 手裏剣が敵に当たった
+        if (bodyNameA.isEqual(kEnemyName) && bodyNameB.isEqual(kWeponName)) ||
+            (bodyNameB.isEqual(kEnemyName) && bodyNameA.isEqual(kWeponName)) {
             
-            //  print("DID OTHER WALL")
+            var enemy = CharactorNode()
             
+            var wepon: SKNode
             
-            let road: SKNode = self.childNode(withName: kRoadName)!
-            let pt: CGPoint = self.convert(contact.contactPoint, to: road)
-            self.makeSparkParticle(pt)
-        }
-    }
-    
-    //炎パーティクル作成
-    func makeFireParticle(_ point: CGPoint) {
-        if _particleFire == nil {
-            let road: SKNode = self.childNode(withName: kRoadName)!
-            
-            do {
-                let fileURL = Bundle.main.url(forResource: "Fire", withExtension: "sks")!
-                let fileData = try Data(contentsOf: fileURL)
-            
-                _particleFire = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(fileData) as? SKEmitterNode
-                _particleFire!.numParticlesToEmit = 350
-            } catch {
-                print("didn't work")
+            if bodyNameB.isEqual(kWeponName) {
+                enemy = contact.bodyA.node as! CharactorNode
+                wepon = contact.bodyB.node!
+            } else {
+                enemy = contact.bodyB.node  as! CharactorNode
+                wepon = contact.bodyA.node!
+                
             }
+            //敵のHPを減らす
+            enemy.hp -= contact.collisionImpulse
             
-            road.addChild(_particleFire!)
-        } else {
-            _particleFire!.resetSimulation()
-        }
-        
-        _particleFire!.position = point
-    }
-    
-    //スパークパーティクル作成
-    func makeSparkParticle(_ point: CGPoint) {
-        if _particleSpark == nil {
-            let road: SKNode = self.childNode(withName: kRoadName)!
-                        
-            do {
-                let fileURL = Bundle.main.url(forResource: "Spark", withExtension: "sks")!
-                let fileData = try Data(contentsOf: fileURL)
             
-                _particleSpark = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(fileData) as? SKEmitterNode
-            } catch {
-                print("didn't work")
+            //敵をノックバックさせる
+            enemy.isGetDamage = true
+            enemy.getDamage()
+            
+            
+            let angle: CGFloat = wepon.zRotation
+            let x: CGFloat = sin(angle)*(contact.collisionImpulse/3)
+            let y: CGFloat = cos(angle)*(contact.collisionImpulse/3)
+            
+            enemy.physicsBody!.applyImpulse(CGVector(dx: -x,
+                                                     dy: y))
+            wepon.removeFromParent()
+            //手裏fadeAlphato:
+            //敵死亡
+            if enemy.hp <= 0 {
+                //敵を透明にして消す
+                enemy.physicsBody!.collisionBitMask = 0
+                
+                let ary: [SKAction] = [SKAction.fadeAlpha(to: 0,
+                                                          duration: 0.25),
+                                       SKAction.removeFromParent()]
+                
+                enemy.run(SKAction.sequence(ary))
             }
-            
-            _particleSpark!.numParticlesToEmit = 100
-            road.addChild(_particleSpark!)
-        } else {
-            _particleSpark!.resetSimulation()
         }
         
-        _particleSpark!.position = point
-    }
-    
-    //スモークパーティクル作成
-    func makeSmokeParticle(_ point: CGPoint) {
-        if _particleSmoke == nil {
-            let road: SKNode = self.childNode(withName: kRoadName)!
+        //敵がプレイヤーに接触
+        if (bodyNameA.isEqual(kPlayerName) && bodyNameB.isEqual(kEnemyName)) ||
+            (bodyNameB.isEqual(kPlayerName) && bodyNameA.isEqual(kEnemyName)) {
             
-            do {
-                let fileURL = Bundle.main.url(forResource: "Smoke", withExtension: "sks")!
-                let fileData = try Data(contentsOf: fileURL)
+            var enemy = CharactorNode()
             
-                _particleSmoke = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(fileData) as? SKEmitterNode
-            } catch {
-                print("didn't work")
+            if bodyNameB.isEqual(kEnemyName) {
+                enemy = contact.bodyB.node as! CharactorNode
+            } else {
+                enemy = contact.bodyA.node as! CharactorNode
+                
             }
-            
-            road.addChild(_particleSmoke!)
-        } else {
-            _particleSmoke?.resetSimulation()
-        }
-        
-        _particleSmoke!.position = point
-    }
-    
-    //ゲームオーバー
-    func showGameOver() {
-        if _gameOver == false {
-            //プレイヤーカーを検索
-            let road: SKNode = self.childNode(withName: kRoadName)!
-            let reacingCar: SKSpriteNode = ((road.childNode(withName: kPlayerCarName) as? SKSpriteNode)!)
-            
-            self.physicsWorld.speed = 0
-            
-            //物理シミュレーション停止
-            _gameOver = true
-            
-            //ゲームオーバーフラグ
-            let gameOverLabel: SKLabelNode = SKLabelNode(fontNamed: "Baskerville-Bold")
-            gameOverLabel.text = "GAME OVER"
-            gameOverLabel.fontSize = 30
-            gameOverLabel.position = CGPoint(x: self.frame.midX,
-                                             y: reacingCar.position.y + 160)
-            road.addChild(gameOverLabel)
+            //敵がプレイヤーを攻撃する
+            enemy.shoot() { [self] angle in
+                //プレイヤーのHPを減らす
+                self.playerNode.hp -= 10
+                //プレイヤーにダメージパターン
+                self.playerNode.isGetDamage = true
+                self.playerNode.getDamage()
+                //プレイヤー死亡
+                if self.playerNode.hp <= 0 {
+                    //プレイヤーを透明にして消す
+                    self.playerNode.physicsBody!.collisionBitMask = 0
+                    
+                    let ary: [SKAction] = [SKAction.fadeAlpha(to: 0, duration: 0.25),
+                                           SKAction.removeFromParent()]
+                    
+                    self.playerNode.run(SKAction.sequence(ary))
+                }
+                
+            }
         }
     }
 }
