@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "background.png",
+      "filename" : "ceiling.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "background@2x.png",
+      "filename" : "ceiling@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

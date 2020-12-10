@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "background.png",
+      "filename" : "coral_under.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "background@2x.png",
+      "filename" : "coral_under@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

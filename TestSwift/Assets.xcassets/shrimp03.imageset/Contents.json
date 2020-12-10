@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "background.png",
+      "filename" : "shrimp03.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "background@2x.png",
+      "filename" : "shrimp03@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
