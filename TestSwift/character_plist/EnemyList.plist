@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>name</key>
+		<string>ブルーモンスター</string>
+		<key>hp</key>
+		<integer>500</integer>
+		<key>attack</key>
+		<integer>100</integer>
+		<key>velocity</key>
+		<integer>15</integer>
+		<key>exp</key>
+		<integer>10</integer>
+		<key>isBoss</key>
+		<false/>
+	</dict>
+	<dict>
+		<key>name</key>
+		<string>レッドモンスター</string>
+		<key>hp</key>
+		<integer>600</integer>
+		<key>attack</key>
+		<integer>100</integer>
+		<key>velocity</key>
+		<integer>20</integer>
+		<key>exp</key>
+		<integer>20</integer>
+		<key>isBoss</key>
+		<false/>
+	</dict>
+	<dict>
+		<key>name</key>
+		<string>グリーンモンスター</string>
+		<key>hp</key>
+		<integer>800</integer>
+		<key>attack</key>
+		<integer>100</integer>
+		<key>velocity</key>
+		<integer>30</integer>
+		<key>exp</key>
+		<integer>30</integer>
+		<key>isBoss</key>
+		<false/>
+	</dict>
+	<dict>
+		<key>name</key>
+		<string>ホワイトモンスター</string>
+		<key>hp</key>
+		<integer>1000</integer>
+		<key>attack</key>
+		<integer>100</integer>
+		<key>velocity</key>
+		<integer>0</integer>
+		<key>exp</key>
+		<integer>100</integer>
+		<key>isBoss</key>
+		<true/>
+	</dict>
+</array>
+</plist>

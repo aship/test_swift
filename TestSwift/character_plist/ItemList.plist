@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>imageName</key>
+		<string>cnt_bow_white</string>
+		<key>name</key>
+		<string>ホワイト・ボウ</string>
+		<key>cost</key>
+		<integer>100</integer>
+		<key>attack</key>
+		<integer>20</integer>
+	</dict>
+	<dict>
+		<key>imageName</key>
+		<string>cnt_bow_red</string>
+		<key>name</key>
+		<string>レッド・ボウ</string>
+		<key>cost</key>
+		<integer>200</integer>
+		<key>attack</key>
+		<integer>30</integer>
+	</dict>
+	<dict>
+		<key>imageName</key>
+		<string>cnt_bow_blue</string>
+		<key>name</key>
+		<string>ブルー・ボウ</string>
+		<key>cost</key>
+		<integer>800</integer>
+		<key>attack</key>
+		<integer>50</integer>
+	</dict>
+	<dict>
+		<key>imageName</key>
+		<string>cnt_bow_green</string>
+		<key>name</key>
+		<string>グリーン・ボウ</string>
+		<key>cost</key>
+		<integer>2000</integer>
+		<key>attack</key>
+		<integer>90</integer>
+	</dict>
+	<dict>
+		<key>imageName</key>
+		<string>cnt_bow_black</string>
+		<key>name</key>
+		<string>ブラック・ボウ</string>
+		<key>cost</key>
+		<integer>4000</integer>
+		<key>attack</key>
+		<integer>150</integer>
+	</dict>
+</array>
+</plist>
