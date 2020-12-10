@@ -1,191 +1,107 @@
 //
 //  GameSceneTouches.swift
-//  ArrowShooter
+//  TestSwift
 //
-//  Created by aship on 2020/11/09.
-//  Copyright © 2020 STUDIO SHIN. All rights reserved.
+//  Created by aship on 2020/11/11.
 //
 
 import SpriteKit
 
 extension GameScene {
-    //タッチダウンされた時に呼ばれる
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        if self.gameState != .gamePlaying || self.pause {
-            //------------------------------------
-            //編集
-            //------------------------------------
-            if self.gameState == .gameEdit {
-                self.putNode = nil
-                //タップした位置のノードを得る
-                for touch in touches {
-                    let location = touch.location(in: self.baseNode)
-                    let chaNode = self.baseNode.atPoint(location) as? CharactorNode
-                    if chaNode != nil {
-                        self.putNode = chaNode
-                    } else {
-                        let itemNode = self.baseNode.atPoint(location) as? SKSpriteNode
-                        if itemNode != nil && itemNode!.userData != nil {
-                            self.putNode = itemNode
-                        }
-                    }
-                    //新規作成
-                    if self.putNode == nil && self.editMode == 0 {
-                        let pt = CGPoint(x: position.x, y: position.y+22)
-                        switch self.putKind {
-                        case 0:        //敵
-                            self.putNode = self.makeEnemy(self.putNumber, position: pt)
-                        case 1:        //障害物
-                            self.putNode = self.makeObstacle(self.putNumber, position: pt)
-                        case 2:        //アイテム in ボックス
-                            self.putNode = self.makeItemBox(self.putNumber, position: pt)
-                        default:
-                            self.putNode = nil
-                        }
-                    }
-                }
-            }
-            return    //ゲームプレイ中でなければ抜ける
+    override func touchesBegan(_ touches: Set<UITouch>,
+                               with event: UIEvent?) {
+        if _gameOver {
+            //            if _gameDelegate.responds(to: "sceneEscape:") {
+            //                _gameDelegate.sceneEscape(self)
+            //            }
+            //            return
         }
         
-        for touch in touches {
-            //ゲームコントローラノードを検索
-            let pt = touch.location(in: self)
-            let touchNode: SKNode? = self.atPoint(pt)
-            
-            if let node = touchNode {
-                //------------------------------------
-                //弓をタップ
-                //------------------------------------
-                if    node === self.cntBackNode ||
-                        node === self.cntBowNode ||
-                        node === self.cntRotNode ||
-                        node === self.cntArrowNode {
-                    
-                    //プレイヤー移動停止
-                    self.moveTimer?.invalidate()    //タイマー停止
-                    self.moving = false
-                    self.playerNode.physicsBody!.velocity = CGVector(dx: 0, dy: 0)
-                    
-                    //待機アニメーション開始
-                    self.playerNode.startWaitTextureAnimation()
+        //宇宙船の回頭中はミサイル発射不可
+        if _isRotating == false {
+            for touch: AnyObject in touches {
+                let location: CGPoint = touch.location(in: self)
+                
+                //名前から宇宙船を検索
+                let spaceship: SKNode = self.childNode(withName: kSpaceshipName)!
+                //宇宙船の位置
+                let spaceship_pt: CGPoint = spaceship.position
+                
+                //宇宙船の新しい角度
+                let dx = Float(location.x - spaceship_pt.x)
+                let dy = Float(location.y - spaceship_pt.y)
+                let radian: CGFloat = CGFloat(-1 * atan2f(dx, dy))
+                
+                
+                //回転角度から回転時間を求める
+                let diff: CGFloat = CGFloat(fabsf(Float(spaceship.zRotation-radian)))
+                let time: TimeInterval = TimeInterval(diff * 0.3)
+                
+                // 回転中フラグON
+                _isRotating = true
+                
+                let rotate: SKAction = SKAction.rotate(toAngle: radian, duration: time)
+                
+                spaceship.run(rotate) { [self] in
+                    // 宇宙船回頭後、ミサイル発射
+                
+                    self._isRotating = false
 
-                    let location = touch.location(in: self.cntBackNode)
-                    self.drawingBow = false
+                    //ミサイル作成
+                    let missaile: SKSpriteNode = SKSpriteNode(texture: self._textureMissile)
+                    missaile.position = CGPoint(x: spaceship_pt.x,
+                                                y: spaceship_pt.y)
+                    missaile.name = kMissileName
+                    self.addChild(missaile)
                     
-                    if self.shootOK {
-                        self.deformShootControl(location)        //コントローラを変形させる
-                    }
-                    else {
-                        let centerPt = self.cntRotNode.position
-                        //中心とタップ位置の角度により回転コントローラノードを回転させる
-                        let radian = atan2(location.y-centerPt.y,
-                                           location.x-centerPt.x)
-                        self.shootRadian = radian - CGFloat(Double.pi * 1.5)
-                        self.cntRotNode.zRotation = self.shootRadian
-                    }
-                }
-            }
-        }
-    }
-    
-    //射撃コントローラを変形させる
-    func deformShootControl(_ location: CGPoint) {
-        let centerPt = self.cntRotNode.position
-        //中心とタップ位置の角度により回転コントローラノードを回転させる
-        let radian = atan2(location.y-centerPt.y,
-                           location.x-centerPt.x)
-        
-        self.shootRadian = radian - CGFloat(Double.pi * 1.5)
-        self.cntRotNode.zRotation = self.shootRadian
-        
-        // 中心とタップ位置の距離により弓を変形させる
-        // 距離を計測
-        let length = self.makeLength(pt1: centerPt, pt2: location)
-        self.drawLength = length
-        var perx = 1 - (self.drawLength / 200)
-        
-        if perx < 0.5 {
-            perx = 0.5
-        }
-        
-        let pery = (self.drawLength / 200) + 1
-        self.cntBowNode.xScale = perx
-        self.cntBowNode.yScale = pery
-        //中心とタップ位置の距離により矢の位置をずらす
-        self.cntArrowNode.position = CGPoint(x: 0, y: -(self.drawLength*0.5))
-        
-    }
-    
-    //タッチムーブされた時に呼ばれる
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        if self.gameState != .gamePlaying || self.pause {
-            //------------------------------------
-            //編集
-            //------------------------------------
-            if self.gameState == .gameEdit {
-                
-                if self.putNode != nil {
-                    for touch in touches {
-                        let location = touch.location(in: self.baseNode)
-                        let pt = CGPoint(x: location.x, y: location.y+22)
-                        self.putNode.position = pt
+                    //物理シミュレーション
+                    missaile.physicsBody = SKPhysicsBody(rectangleOf: missaile.size)
+                    
+                    //宇宙船の向きにミサイル発射
+                    missaile.zRotation = radian
+                    
+                    let x: CGFloat = sin(radian)
+                    let y: CGFloat = cos(radian)
+                    
+                    missaile.physicsBody!.velocity = CGVector(dx: -(400 * x),
+                                                              dy: (400 * y))
+                    
+                    //ベクトル
+                    
+                    //接触設定
+                    missaile.physicsBody!.categoryBitMask = UInt32(missileCategory)
+                    //カテゴリー（ミサイル）
+                    missaile.physicsBody!.contactTestBitMask = UInt32(meteorCategory)
+                    //ヒットテストするオブジェクト（隕石）
+                    missaile.physicsBody!.collisionBitMask = UInt32(meteorCategory)
+                    //接触できるオブジェクト（隕石）
+                    
+                    // パーティクル
+                    do {
+                        let fileURL = Bundle.main.url(forResource: "Spark", withExtension: "sks")!
+                        let fileData = try Data(contentsOf: fileURL)
+                        let fireSpark = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(fileData) as! SKEmitterNode
+                        
+                        fireSpark.position = CGPoint(x: (missaile.size.width / 2) - 7,
+                                                     y: -(missaile.size.height / 2))
+                        
+                        
+                        //パーティクルの調整。ロケット噴射のように見せる
+                        fireSpark.particleLifetime = 0.1
+                        fireSpark.numParticlesToEmit = 50
+                        fireSpark.particleBirthRate = 200
+                        fireSpark.emissionAngle = CGFloat(-(Double.pi/2))
+                        fireSpark.emissionAngleRange = 0
+                        fireSpark.particlePositionRange = CGVector(dx: 0,
+                                                                   dy: 0)
+                        //ロケットに配置
+                        missaile.addChild(fireSpark)
+                        
+                    } catch {
+                        print("didn't work")
                     }
                 }
             }
-            return    //ゲームプレイ中でなければ抜ける
         }
-        
-        
-        if self.shootOK {
-            if self.drawingBow == false {
-                self.drawingBow = true
-            }
-            for touch in touches {
-                let location = touch.location(in: self.cntBackNode)
-                self.deformShootControl(location)    //射撃コントローラを変形させる
-            }
-        }
-    }
-    //タッチアップされた時に呼ばれる
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        if self.gameState != .gamePlaying || self.pause {
-            //------------------------------------
-            //MARK: 編集
-            //------------------------------------
-            if self.gameState == .gameEdit {
-                
-                if self.putNode != nil && self.editMode == 1 {
-                    self.putNode.removeFromParent()    //ノードを削除
-                }
-                self.putNode = nil
-            }
-            return    //ゲームプレイ中でなければ抜ける
-        }
-        
-        //------------------------------------
-        //MARK:弓をタップ
-        //------------------------------------
-        if self.shootOK {
-            self.shootAnimation()    //コントローラ射撃アニメーション
-            
-            //プレイヤー位置から矢を射撃する
-            let pt = self.playerNode.position
-            self.shootArrow(CGPoint(x: pt.x,
-                                    y: pt.y+(self.playerNode.size.height/2)))
-            //弓を引いているフラグOFF
-            self.drawingBow = false
-        }
-        
-        //プレイヤー移動開始タイマー
-        self.moveTimer = Timer.scheduledTimer(
-            timeInterval: 0.5,
-            target: self,
-            selector: #selector(GameScene.moveStartTimer),
-            userInfo: nil,
-            repeats: false)
     }
 }
