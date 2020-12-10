@@ -8,51 +8,40 @@
 import SpriteKit
 
 extension GameScene {
+    
     override func touchesBegan(_ touches: Set<UITouch>,
-                               with event: UIEvent?) {
+                                   with event: UIEvent?) {
+        /* Called when a touch begins */
         for touch: AnyObject in touches {
             _ = touch.location(in: self)
             
-            //アームを上げる
-            let swingAction1 = SKAction.rotate(byAngle: CGFloat(-Double.pi * 0.25), duration:0.05)
-            let swingAction2 = SKAction.rotate(byAngle: CGFloat(Double.pi * 0.25), duration:0.05)
-            armRight.run(swingAction1)
-            armLeft.run(swingAction2)
+            //ゲームオーバーの時に画面をタップしたらゲームを再スタート
+            if gameoverFlg == true {
+                //得点をリセット
+                point = 0
+                
+                //blocksNode上のブロックを削除
+                blocksNode.removeAllChildren()
+                
+                //blocksNodeを削除
+                blocksNode.removeFromParent()
+                
+                //全部のオブジェクトを削除
+                self.removeAllChildren()
+                
+                //オブジェクトを配置し直す
+                self.layoutObjects()
+                
+                //ゲームオーバーフラグを下げる
+                gameoverFlg = false
+                
+                //再開
+                self.isPaused = false
+                
+                //テクスチャをセット
+                charaSprite.texture = SKTexture(imageNamed: "up")
+            }
         }
         
-        //ゲームオーバーだったらスタート位置に戻す
-        if gameoverFlg == true {
-            self.reset()
-        }
-    }
-    
-    func reset(){
-        //ゲームオーバーフラグをもどす
-        gameoverFlg = false
-        
-        //ゲームオーバーラベルを削除
-        gameoverLabel.removeFromParent()
-        
-        //ボールを削除して作り直す
-        ball.removeFromParent()
-        self.makeBall()
-        
-        //得点を0にもどす
-        count = 0
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>,
-                               with event: UIEvent?) {
-        for touch: AnyObject in touches {
-            _ = touch.location(in: self)
-            
-            //アームを下げる
-            let swingAction1 = SKAction.rotate(byAngle: CGFloat(-Double.pi * 0.25),
-                                               duration:0.05)
-            let swingAction2 = SKAction.rotate(byAngle: CGFloat(Double.pi * 0.25),
-                                               duration:0.05)
-            armRight.run(swingAction2)
-            armLeft.run(swingAction1)
-        }
     }
 }

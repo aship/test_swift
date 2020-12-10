@@ -8,43 +8,92 @@
 import SpriteKit
 
 extension GameScene {
+    //ここで加点・ジャンプ・ゲームオーバーの判定をしています
     func didBegin(_ contact: SKPhysicsContact) {
-        if let nodeA = contact.bodyA.node {
-            if let nodeB = contact.bodyB.node {
-                //衝突したオブジェクトにmonsterが含まれていたらポイント加算
-                if nodeA.name == "monster1" ||
-                    nodeB.name == "monster1" ||
-                    nodeA.name == "monster2" ||
-                    nodeB.name == "monster2" ||
-                    nodeA.name == "monster3" ||
-                    nodeB.name == "monster3"{
-                    //ここに衝突が発生したときの処理を書く
-                    //効果音を再生する
-                    ball.run(playSound)
-                    
-                    //パーティクルの作成
-                    let particle:SKEmitterNode! = SKEmitterNode(fileNamed: "MyParticle.sks")
-                    self.addChild(particle)
-                    
-                    //１秒後にパーティクルを削除する ぶつかるたびにパーティクルが増えて重くなる
-                    let removeAction = SKAction.removeFromParent()
-                    let durationAction = SKAction.wait(forDuration: 1)
-                    let sequenceAction = SKAction.sequence([durationAction,removeAction])
-                    particle.run(sequenceAction)
-                    
-                    //ボールの位置にパーティクル移動
-                    particle.position = CGPoint(x: ball.position.x,y: ball.position.y)
-                    particle.alpha = 1
-                    
-                    let fadeAction = SKAction.fadeAlpha(to: 0, duration: 0.5)
-                    particle.run(fadeAction)
-                    
-                    //得点を加算する。
-                    count += 10
-                    let pointString:String = "\(count)点"
-                    pointLabel.text = pointString
+        //contactFlgがtrue（芭蕉が落下中）の時のみ実行する
+        if(contactFlg == true){
+            //0.5秒でy座標を100　nodeを下方向に移動する
+            let moveA = SKAction.move(by: CGVector(dx:0, dy:-100),
+                                      duration: 0.5)
+            blocksNode.run(moveA)
+            charaSprite.physicsBody?.velocity = CGVector(dx:0,
+                                                         dy:300)
+            
+            //床に衝突したらゲームオーバー、ブロックと衝突したらジャンプ
+            if( contact.bodyA.node?.name == "floor" || contact.bodyB.node?.name == "floor"  ){
+                print("ゲームオーバー")
+                gameoverSprite.isHidden = false
+                self.gameover()
+            }else{
+                //ポイントを加算してラベルに表示
+                point = point + 1
+                pointLabel.text =  "\(point)里"
+                
+                //20里毎に俳句を表示する。俳句の画像の種類は200里までなので200以下の条件も追加する
+                if(point%20 == 0 && point <= 200){
+                    self.showHaiku(point: point)
                 }
             }
+            
+            //ジャンプするときのアニメーション
+            let changeTexture = SKAction.animate(with: [SKTexture(imageNamed: "up"),
+                                                        SKTexture(imageNamed: "down")],
+                                                 timePerFrame: 0.2)
+            charaSprite.run(changeTexture)
+        }
+    }
+    
+    
+    func showHaiku(point:Int)
+    {
+        //フェードイン
+        let alphaAction = SKAction.fadeAlpha(to: 1, duration: 0.5)
+        //５秒間待ち
+        let delayAction = SKAction.wait(forDuration: 5)
+        //フェードアウト
+        let alphaAction2 = SKAction.fadeAlpha(to: 0, duration: 0.5)
+        //フェードと待ちのアクションの順番を設定
+        let sequenceAction = SKAction.sequence([alphaAction,delayAction,alphaAction2])
+        //リピート回数は1回
+        let repeatAction = SKAction.repeat(sequenceAction, count: 1)
+        
+        //俳句の画像を切り替え
+        haikuSprite.texture = SKTexture(imageNamed:"paper\(point)")
+        
+        //アクション実行
+        haikuSprite.run(repeatAction)
+    }
+    
+    
+    
+    func gameover()
+    {
+        //ゲームオーバーフラグ
+        gameoverFlg = true
+        
+        //一時停止
+        self.isPaused = true
+        
+        //キャラクタの画像を失敗用の画像に差し替える
+        charaSprite.texture = SKTexture(imageNamed: "miss")
+        
+        //ハイスコアを記録
+        self.highScore()
+        
+    }
+    
+    func highScore() {
+        //NSUserDefaultsで保存したハイスコアを読み込む
+        let highscore:Int = defaults.integer(forKey: "HIGHSCORE")
+        
+        //今回の得点がハイスコアよりも大きければ、今回の得点を保存する
+        if(point > highscore ){
+            //HIGHSCOREという名前でint型でpointを保存する
+            defaults.set(point, forKey:"HIGHSCORE")
+            //保存した値を反映する
+            defaults.synchronize()
+            //ハイスコアをラベルに表示する
+            highScoreLabel.text = NSString(format: "ハイスコア：%d里",self.defaults.integer(forKey: "HIGHSCORE")) as String
         }
     }
 }
