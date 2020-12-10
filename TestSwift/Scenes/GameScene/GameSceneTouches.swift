@@ -8,40 +8,36 @@
 import SpriteKit
 
 extension GameScene {
-    
+    // タッチイベント時
     override func touchesBegan(_ touches: Set<UITouch>,
                                    with event: UIEvent?) {
-        /* Called when a touch begins */
-        for touch: AnyObject in touches {
-            _ = touch.location(in: self)
+        // タッチしたときのシーン上の位置を求める
+        let touch = touches.first!
+        let touchLocation = touch.location(in: self)
+        
+        // プレイヤーの現在位置を取得
+        if let playerLocation = self.player?.sprite?.position {
+            // タッチ位置とプレイヤーの位置との差を求める
+            let x = touchLocation.x - playerLocation.x
+            let y = touchLocation.y - playerLocation.y
+
+            // 絶対値が大きい方向を求める
+            var nextDirection: Direction
+            if abs(x) > abs(y) {
+                nextDirection = x > 0 ? .Right : .Left
+            } else {
+                nextDirection = y > 0 ? .Up : .Down
+            }
             
-            //ゲームオーバーの時に画面をタップしたらゲームを再スタート
-            if gameoverFlg == true {
-                //得点をリセット
-                point = 0
-                
-                //blocksNode上のブロックを削除
-                blocksNode.removeAllChildren()
-                
-                //blocksNodeを削除
-                blocksNode.removeFromParent()
-                
-                //全部のオブジェクトを削除
-                self.removeAllChildren()
-                
-                //オブジェクトを配置し直す
-                self.layoutObjects()
-                
-                //ゲームオーバーフラグを下げる
-                gameoverFlg = false
-                
-                //再開
-                self.isPaused = false
-                
-                //テクスチャをセット
-                charaSprite.texture = SKTexture(imageNamed: "up")
+            if let player = self.player {
+                // プレイヤーが方向転換可能であれば
+                if player.canRotate(direction: nextDirection) {
+                    // 次回の方向として反映する
+                    player.nextDirection = nextDirection
+                    // プレイヤーの動きが止まっていれば動かす
+                    player.startMoving()
+                }
             }
         }
-        
     }
 }

@@ -6,12 +6,10 @@
       "scale" : "1x"
     },
     {
-      "filename" : "gameover@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "gameover@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
