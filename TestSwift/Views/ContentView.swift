@@ -10,7 +10,7 @@ import SpriteKit
 
 struct ContentView: View {
     var body: some View {
-        SpriteView(scene: TitleScene())
+        SpriteView(scene: GameScene())
             .edgesIgnoringSafeArea(.all)
     }
 }
