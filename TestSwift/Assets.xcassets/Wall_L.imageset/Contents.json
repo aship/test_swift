@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "TitleBack.png",
+      "filename" : "Wall_L.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "TitleBack@2x.png",
+      "filename" : "Wall_L@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

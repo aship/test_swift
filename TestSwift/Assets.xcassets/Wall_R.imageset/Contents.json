@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "Meteor.png",
+      "filename" : "Wall_R.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Meteor@2x.png",
+      "filename" : "Wall_R@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

@@ -8,141 +8,165 @@
 import SpriteKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    
-    let kMissileName   = "Missile"        //ミサイル
-    let kSpaceshipName  = "Spaceship"    //宇宙船
-    let  kMeteorName   = "Meteor"        //隕石
-    let  kEarthName    = "Earth"        //地球
-    let kBackName  = "Back"            //背景
-    let  kScoreName    = "Score"        //スコア
-    let   kFallenName  = "Fallen"        //落下数
-    let  kLevelName   = "Level"        //レベル
+    let kRoadName = "Road"
+    let kWallName = "Wall"                //壁（ガードレール）
+    let kPlayerCarName = "PlayerCar"        //プレイヤーカー
+    let kOtherCarName = "OtherCar"            //その他の車
+    let kRoadViewName = "RoadView"            //道路（表示スプライト）
+    let kDistLabelName = "DistLabel"        //距離
+    let kSpeedLabelName = "Speed"
     
     //カテゴリビットマスク
-    var missileCategory    =  0x1 << 0;    //ミサイル
-    var meteorCategory    =  0x1 << 1;    //隕石
-    var earthCategory        =  0x1 << 2;    //地球
-    var spaceshipCategory    =  0x1 << 3;    //宇宙船
+    let wallCategory        =  0x1 << 0;    //壁（ガードレール）
+    let playerCarCategory    =  0x1 << 1;    //プレイヤーカー
+    let otherCarCategory    =  0x1 << 2;    //その他の車
     
-    var score = 0            //スコア
-    var fallenNumber = 0    //隕石衝突数
+    var gameDelegate: Int = 0
+    var distance: CGFloat = 0.0
     
-    var _isRotating = false
     
-    var _textureMissile: SKTexture?
-    var _textureMeteor: SKTexture?
-    
+    var _carStartPt = CGPoint(x: 0, y: 0)
     var _gameOver = false
-    
+    var _acceleON = false
+    var _touchPoint = CGPoint(x: 0, y: 0)
+    var _accelete: CGFloat = 0.0
     var _particleFire: SKEmitterNode?
     var _particleSpark: SKEmitterNode?
-    var _particleBom: SKEmitterNode?
     var _particleSmoke: SKEmitterNode?
+    
+    // 縦に何枚の画像をつなげるか
+    let numberOfRoad = 3
+    let numberOfWall = 3
+    
+    // プレイヤーの初期位置
+    let playerOffsetY = -160
     
     override func sceneDidLoad() {
         self.scaleMode = .resizeFill
         self.anchorPoint = CGPoint(x: 0.5,
                                    y: 0.5)
     }
-
+    
     override func didMove(to view: SKView) {
         //接触デリゲート
         self.physicsWorld.contactDelegate = self
         
-        //背景
-        let space: SKSpriteNode = SKSpriteNode(imageNamed: "GameBack.png")
-        space.position = CGPoint(x: 0,
-                                 y: 0)
-        space.name = kBackName
-        self.addChild(space)
+        //=============================================
+        //道路
+        let roadNode: SKNode = SKNode()
+        roadNode.name = kRoadName
+        self.addChild(roadNode)
         
-        // 地球
-        let earth: SKSpriteNode = SKSpriteNode(imageNamed: "Earth.png")
-        earth.position = CGPoint(x: 0,
-                                 y: earth.size.height / 2 - screenHeight / 2)
-        earth.name = kEarthName
-        earth.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: earth.size.width,
-                                                              height: earth.size.height / 2))
-        earth.physicsBody!.isDynamic = false
-        earth.physicsBody!.categoryBitMask = UInt32(earthCategory)
-        //接触できるオブジェクト（なし）
-        earth.physicsBody!.collisionBitMask = 0
-        self.addChild(earth)
+        print("roadNode.position  \(roadNode.position)")
+        //  print("roadNode.size  \(roadNode.fra)")
         
-        // 宇宙船
-        let spaceship: SKSpriteNode = SKSpriteNode(imageNamed: "Spaceship.png")
-        spaceship.position = CGPoint(x: 0,
-                                     y: spaceship.size.height - screenHeight / 2)
-        spaceship.name = kSpaceshipName
-        spaceship.physicsBody = SKPhysicsBody(circleOfRadius: spaceship.size.width / 2)
-        spaceship.physicsBody!.isDynamic = false
+        // road
+        for i in 0 ..< self.numberOfRoad {
+            let road = SKSpriteNode(imageNamed: "Road.png")
+            road.name = kRoadViewName
+            road.position = CGPoint(x: 0,
+                                    y: Int(road.size.height) * i)
+            roadNode.addChild(road)
+        }
+        
+        // left wall
+        for i in 0 ..< self.numberOfWall {
+            let wall = SKSpriteNode(imageNamed: "Wall_L.png")
+            wall.name = kWallName
+            
+            let positionX: CGFloat = -1 * screenWidth / 2 + wall.size.width / 2
+            let positionY: CGFloat = CGFloat(Int(wall.size.height) * i)
+            
+            wall.position = CGPoint(x: positionX,
+                                    y: positionY)
+            wall.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: wall.size.width,
+                                                                 height: wall.size.height))
+            wall.physicsBody!.affectedByGravity = false
+            wall.physicsBody!.categoryBitMask = UInt32(wallCategory)
+            wall.physicsBody!.collisionBitMask = 0
+            roadNode.addChild(wall)
+        }
+        
+        // right wall
+        for i in 0 ..< self.numberOfWall {
+            let wall = SKSpriteNode(imageNamed: "Wall_R.png")
+            wall.name = kWallName
+            
+            wall.position = CGPoint(x: screenWidth / 2 - wall.size.width / 2,
+                                    y: wall.size.height * CGFloat(i))
+            
+            wall.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: wall.size.width,
+                                                                 height: wall.size.height))
+            wall.physicsBody!.affectedByGravity = false
+            //重力適用なし
+            wall.physicsBody!.categoryBitMask = UInt32(wallCategory)
+            wall.physicsBody!.collisionBitMask = 0
+            roadNode.addChild(wall)
+        }
+        
+        
+        //プレイヤーカー
+        let playerCar: SKSpriteNode = SKSpriteNode(imageNamed: "PlayerCar.png")
+        playerCar.name = kPlayerCarName
+        
+        roadNode.addChild(playerCar)
+        
+        playerCar.position = CGPoint(x: 0,
+                                     y: playerOffsetY)
+        _carStartPt = playerCar.position
+        
+        //初期位置を記録
+        playerCar.physicsBody = SKPhysicsBody(rectangleOf: playerCar.size)
+        // 重力適用なし
+        playerCar.physicsBody!.affectedByGravity = false
+        // 衝突による角度変更なし
+        playerCar.physicsBody!.allowsRotation = false
+        
         //接触設定
-        spaceship.physicsBody!.categoryBitMask = UInt32(spaceshipCategory)
-        spaceship.physicsBody!.collisionBitMask = 0
-        self.addChild(spaceship)
+        //カテゴリー（プレイヤーカー）
+        playerCar.physicsBody!.categoryBitMask = UInt32(playerCarCategory)
+        //接触できるオブジェクト（壁／その他の車）
+        playerCar.physicsBody!.collisionBitMask = UInt32(wallCategory|otherCarCategory)
+        //ヒットテストするオブジェクト（壁／その他の車）
+        playerCar.physicsBody!.contactTestBitMask = UInt32(wallCategory|otherCarCategory)
+        //=============================================
         
-        //スコア
-        
-        //タイトル
-        let scoreTitleNode: SKLabelNode = SKLabelNode(fontNamed: "Baskerville-Bold")
-        scoreTitleNode.fontSize = 20
-        scoreTitleNode.text = "SCORE"
-        self.addChild(scoreTitleNode)
-        scoreTitleNode.position = CGPoint(x: -100,
-                                          y: 280)
-        
-        let scoreNode: SKLabelNode = SKLabelNode(fontNamed: "Baskerville-Bold")
-        scoreNode.name = kScoreName
-        scoreNode.fontSize = 20
-        scoreNode.position = CGPoint(x: -40,
-                                     y: 280)
-        self.addChild(scoreNode)
-        
-        // スコア
-        self.score = 0
-        self.setScore(0)
-        
-        // 重力を1/50にする
-        self.physicsWorld.gravity = CGVector(dx: 0,
-                                             dy: -(9.8 * 0.02))
-        
-        //ミサイルのテクスチャ
-        _textureMissile = SKTexture(imageNamed: "Missile.png")
-        //隕石のテクスチャ
-        _textureMeteor = SKTexture(imageNamed: "Meteor.png")
-        
-        
-        
-        //隕石を一定間隔でランダムに作る
-        let makeMeteors: SKAction = SKAction.sequence([SKAction.run(self.addMeteor),
-                                                       SKAction.wait(forDuration: 1.8,
-                                                                     withRange: 1.6)])
+        // 車を一定間隔でランダムに作る
+        let makeMeteors: SKAction = SKAction.sequence([SKAction.run(self.addOtherCar),
+                                                       SKAction.wait(forDuration: 1.5,
+                                                                     withRange: 1.0)])
         self.run(SKAction.repeatForever(makeMeteors))
         
-        //隕石落下数
-        let fallenNumNode: SKLabelNode = SKLabelNode(fontNamed: "Baskerville-Bold")
-        fallenNumNode.name = kFallenName
-        fallenNumNode.fontSize = 30
-        fallenNumNode.position = CGPoint(x: 100,
-                                         y: 280)
-        self.addChild(fallenNumNode)
         
-        self.fallenNumber = 3
-        self.setFallenNumber(Int32(self.fallenNumber))
+        //=============================================
+        //走行距離
+        let scoreTitleNode: SKLabelNode = SKLabelNode(fontNamed: "Baskerville-Bold")
+        scoreTitleNode.fontSize = 20
+        scoreTitleNode.text = "Distance"
+        scoreTitleNode.position = CGPoint(x: -50,
+                                          y: 300)
+        self.addChild(scoreTitleNode)
         
-        /*
-         
-         //レベル
-         SKLabelNode*    levelNode = [SKLabelNode labelNodeWithFontNamed:@"Baskerville-Bold"];
-         levelNode.name = kLevelName;
-         levelNode.fontSize = 20;
-         [self addChild:levelNode];
-         self.level = 1;
-         levelNode.position = CGPointMake(self.frame.size.width-(levelNode.frame.size.width/2)-20, self.frame.size.height-60);
-         */
+        let scoreNode: SKLabelNode = SKLabelNode(fontNamed: "Baskerville-Bold")
+        scoreNode.name = kDistLabelName
+        scoreNode.fontSize = 20
+        scoreNode.position = CGPoint(x: 50,
+                                     y: 300)
+        self.addChild(scoreNode)
         
-    }
-    
-    override func willMove(from view: SKView) {
+        // スピード
+        let speedTitleNode: SKLabelNode = SKLabelNode(fontNamed: "Baskerville-Bold")
+        speedTitleNode.fontSize = 20
+        speedTitleNode.text = "Speed"
+        speedTitleNode.position = CGPoint(x: -50,
+                                          y: 260)
+        self.addChild(speedTitleNode)
+        
+        let speedNode: SKLabelNode = SKLabelNode(fontNamed: "Baskerville-Bold")
+        speedNode.name = kSpeedLabelName
+        speedNode.fontSize = 20
+        speedNode.position = CGPoint(x: 50,
+                                     y: 260)
+        self.addChild(speedNode)
     }
 }

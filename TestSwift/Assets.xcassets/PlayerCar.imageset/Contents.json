@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "Earth.png",
+      "filename" : "PlayerCar.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Earth@2x.png",
+      "filename" : "PlayerCar@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

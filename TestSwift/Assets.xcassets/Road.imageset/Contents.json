@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "GameBack.png",
+      "filename" : "Road.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "GameBack@2x.png",
+      "filename" : "Road@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
