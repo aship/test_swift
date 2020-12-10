@@ -2,15 +2,16 @@
 //  ContentView.swift
 //  TestSwift
 //
-//  Created by aship on 2020/11/14.
+//  Created by aship on 2020/10/21.
 //
 
 import SwiftUI
+import SpriteKit
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        SpriteView(scene: GameScene())
+            .edgesIgnoringSafeArea(.all)
     }
 }
 
