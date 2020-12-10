@@ -2,19 +2,16 @@
 //  GameSceneTouches.swift
 //  TestSwift
 //
-//  Created by aship on 2020/11/09.
+//  Created by aship on 2020/11/10.
 //
 
 import SpriteKit
 
 extension GameScene {
-    override func touchesMoved(_ touches: Set<UITouch>,
-                               with event: UIEvent?) {
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch: AnyObject in touches {
-            // ロケットをタッチした位置の少し上に移動する
-            rocket.position = touch.location(in: self)
-            //rocket.position.y += 120
-            rocketspk.particlePosition = rocket.position
+            // ラベル人をタッチした位置に横移動する
+            playerSprite.position.x = touch.location(in: self).x
         }
     }
 }

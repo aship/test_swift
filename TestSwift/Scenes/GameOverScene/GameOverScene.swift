@@ -8,10 +8,11 @@
 import SpriteKit
 
 class GameOverScene: SKScene {
+    var score = 0
+    
+    // ゲームオーバー用ラベルと、リプレイボタン用ラベルを用意する
     let endLabel = SKLabelNode(fontNamed: "Verdana-bold")
     let replayLabel = SKLabelNode(fontNamed: "Verdana-bold")
-    
-    var score = 0
     
     override func sceneDidLoad() {
         self.scaleMode = .resizeFill
@@ -20,16 +21,14 @@ class GameOverScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
-        self.backgroundColor = UIColor(red: 0.09,
-                                       green: 0.15,
-                                       blue: 0.3,
-                                       alpha: 1)
+        // 背景色をつける
+        self.backgroundColor = UIColor(red: 0.8, green: 0.96, blue: 1, alpha: 1)
         // スコアを表示する
         let scoreLabel = SKLabelNode(fontNamed: "Verdana-bold")
-        
-        //let gameSKView = self.view as! GameSKView
+   //     let gameSKView = self.view as! GameSKView
         scoreLabel.text = "SCORE:\(self.score)"
-        scoreLabel.fontSize = 40
+        scoreLabel.fontSize = 20
+        scoreLabel.fontColor = SKColor.brown
         scoreLabel.position = CGPoint(x: 0,
                                       y: 100)
         self.addChild(scoreLabel)
@@ -37,32 +36,33 @@ class GameOverScene: SKScene {
         // ゲームオーバーを表示する
         endLabel.text = "GAMEOVER"
         endLabel.fontSize = 50
-        endLabel.fontColor = UIColor.yellow
+        endLabel.fontColor = UIColor.magenta
         endLabel.position = CGPoint(x: 0,
                                     y: 200)
         self.addChild(endLabel)
         
         // リプレイボタンを表示する
         replayLabel.text = "REPLAY"
-        replayLabel.fontSize = 40
+        replayLabel.fontSize = 30
+        replayLabel.fontColor = SKColor.brown
         replayLabel.position = CGPoint(x: 0,
-                                       y: -150)
+                                       y: -200)
         self.addChild(replayLabel)
     }
-    
+    // タッチしたときの処理
     override func touchesBegan(_ touches: Set<UITouch>,
                                with event: UIEvent?) {
         for touch: AnyObject in touches {
             // タッチした位置にあるものを調べる
             let location = touch.location(in: self)
             let touchNode = self.atPoint(location)
-            
+            // もし、タッチした位置にあるものがリプレイボタンなら
             if touchNode == replayLabel {
                 let scene = TitleScene()
-                scene.scaleMode = .resizeFill
-                scene.anchorPoint = CGPoint(x: 0.5,
-                                            y: 0.5)
-                self.view?.presentScene(scene)
+                let transition = SKTransition.crossFade(withDuration: 1.0)
+                
+                self.view?.presentScene(scene,
+                                        transition: transition)
             }
         }
     }
